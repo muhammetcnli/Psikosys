@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Psikosys</title>
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+    <link rel="icon" type="image/x-icon" th:href="@{/images/favicon.ico}" />
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>Psikosys</h2>
+
+    <div class="new-chat-button">
+        <a href="/chat">
+            <button type="button">New Chat</button>
+        </a>
+    </div>
+
+    <div th:if="${userChats != null && !userChats.isEmpty()}">
+        <div class="sidebar-section">Chats</div>
+
+        <a th:each="userChat : ${userChats}"
+           th:href="@{'/chat/' + ${userChat.id}}"
+           th:class="${chatId != null && chatId == userChat.id} ? 'sidebar-item active' : 'sidebar-item'">
+            <div class="sidebar-item-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+            </div>
+            <span th:text="${userChat.title != null} ? ${userChat.title} : 'Chat ' + ${userChat.createdAt}">Chat Title</span>
+        </a>
+    </div>
+</div>
+
+<!-- Main content area -->
+<div class="chat-container">
+    <div class="chat-header">
+        <!-- Chat title here -->
+        <h2 th:text="${chat != null && chat.title != null} ? ${chat.title} : 'Psikosys'">Psikosys</h2>
+    </div>
+
+    <div class="chat-history">
+        <div th:if="${messages != null}">
+            <div th:each="message : ${messages}" th:class="${message.isUser} ? 'user-message' : 'ai-message'"
+                 th:utext="${message.content}">
+            </div>
+        </div>
+    </div>
+
+    <form th:if="${chatId == null}" class="chat-form" th:action="@{/chat}" method="post">
+        <input type="text" name="question" class="chat-input" placeholder="Ask anything..." required>
+        <button type="submit">&uarr;</button>
+    </form>
+
+    <form th:if="${chatId != null}" class="chat-form" th:action="@{'/chat/' + ${chatId}}" method="post">
+        <input type="text" name="question" class="chat-input" placeholder="Ask anything..." required>
+        <button type="submit">&uarr;</button>
+    </form>
+</div>
+</body>
+</html>

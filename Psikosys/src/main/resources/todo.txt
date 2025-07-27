@@ -1,0 +1,7 @@
+- Gerekli entityleri ekle
+
+- personalities jsonu değiştir
+
+- istediğin şekilde genel chat arayüzünü değiştir, chatControlleri sil
+
+-

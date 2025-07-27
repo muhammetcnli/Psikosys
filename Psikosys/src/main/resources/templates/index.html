@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Psikosys</title>
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+    <link rel="icon" type="image/x-icon" th:href="@{/images/favicon.ico}"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <style>
+        .index-container {
+            margin: auto;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .index-container h1 {
+            color: #4a6fa5;
+            margin-bottom: 20px;
+        }
+
+        .index-container a {
+            display: block;
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<div class="index-container">
+    <h1>Welcome to Psikosys</h1>
+    <a>Simple page for now, you can enter chat page</a>
+    <button onclick="window.location.href='/chat'">Go to Chat</button>
+</div>
+</body>
+</html>
