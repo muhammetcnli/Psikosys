@@ -23,6 +23,8 @@ body {
     border-right: 1px solid #e0e0e0;
     overflow-y: auto;
     padding: 20px 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar h2 {
@@ -30,10 +32,6 @@ body {
     margin-bottom: 25px;
     color: #4a6fa5;
     font-weight: 600;
-}
-
-.sidebar-nav {
-    list-style: none;
 }
 
 .sidebar-item {
@@ -71,12 +69,58 @@ body {
     text-transform: uppercase;
 }
 
-/* Navbar styling */
-.navbar-brand {
-    font-weight: 600;
+/* Profil bölümü */
+.profile-section {
+    margin-top: auto;
+    padding: 15px 0;
+    border-top: 1px solid #e0e0e0;
 }
 
-/* Chat area - blend edilmiş tasarım */
+.profile-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.profile-button {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: #444;
+}
+
+.profile-button:hover {
+    background-color: #f0f4f8;
+}
+
+.profile-icon {
+    width: 32px;
+    height: 32px;
+    background-color: #4a6fa5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    color: white;
+    font-size: 14px;
+    overflow: hidden;
+}
+
+.profile-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.profile-button span {
+    font-weight: 500;
+    font-size: 14px;
+}
+
+/* Chat area */
 .chat-container {
     flex: 1;
     display: flex;
@@ -87,11 +131,6 @@ body {
     max-width: 800px;
     height: 100vh;
     overflow-y: auto;
-    border: none;
-    border-radius: 0;
-    background-color: transparent;
-    box-shadow: none;
-    position: relative;
 }
 
 .chat-header {
@@ -112,8 +151,6 @@ body {
     overflow-y: auto;
     padding: 20px 0;
     margin-bottom: 10px;
-    border-radius: 0;
-    background-color: transparent;
 }
 
 /* Messages */
@@ -144,20 +181,12 @@ body {
     border: 1px solid #eaeaea;
 }
 
-/* Form elements styling - Blend edilmiş tasarım */
+/* Form elements */
 .chat-form {
-    position: relative;
-    bottom: 0;
-    left: 0;
-    right: 0;
     width: 100%;
     display: flex;
     flex-direction: column;
-    background-color: transparent;
-    padding: 0;
-    border-radius: 0;
     margin-top: auto;
-    box-shadow: none;
 }
 
 .chat-input-wrapper {
@@ -187,12 +216,7 @@ body {
     overflow-y: auto;
 }
 
-.chat-input:focus {
-    border-color: transparent;
-    box-shadow: none;
-}
-
-/* Personality selector styling - Mesaj kutusunun içinde */
+/* Personality selector */
 .personality-selector {
     margin-top: 8px;
     padding-top: 8px;
@@ -226,14 +250,8 @@ body {
     background-color: #fff;
 }
 
-.input-container {
-    display: flex;
-    margin-top: 10px;
-}
-
 /* Buttons */
-button,
-button.btn-primary {
+button {
     background-color: #4a6fa5;
     color: white;
     border: none;
@@ -241,22 +259,16 @@ button.btn-primary {
     padding: 12px 25px;
     cursor: pointer;
     font-weight: 500;
-    transition: background-color 0.2s, border-color 0.2s;
+    transition: background-color 0.2s;
 }
 
-button:hover,
-button.btn-primary:hover {
+button:hover {
     background-color: #3a5a8a;
 }
 
 .new-chat-button {
     margin-top: 10px;
     text-align: center;
-}
-
-/* Footer styling */
-footer {
-    margin-top: auto;
 }
 
 button[type="submit"] {

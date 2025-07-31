@@ -33,6 +33,23 @@
             <span th:text="${userChats.size() > 0 && userChat.title != null} ? ${userChat.title} : 'Sohbet ' + ${userChat.createdAt}">Sohbet Başlığı</span>
         </a>
     </div>
+
+    <!-- Profil butonu -->
+    <div class="profile-section">
+        <a href="/profile" class="profile-link">
+            <div class="profile-button">
+                <div class="profile-icon">
+                    <img th:if="${user != null and #strings.length(user.photo) > 0}"
+                         th:src="${user.photo}"
+                         alt="Profil"
+                         class="profile-photo"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <i class="fas fa-user" th:style="${user != null and #strings.length(user.photo) > 0} ? 'display: none;' : 'display: flex;'"></i>
+                </div>
+                <span th:text="${user != null and #strings.length(user.name) > 0} ? ${user.name} : 'Profil'">Profil</span>
+            </div>
+        </a>
+    </div>
 </div>
 
 <!-- Main content area -->
@@ -58,14 +75,13 @@
                 <button type="submit"><i class="fas fa-paper-plane"></i></button>
             </div>
 
-            <!-- Kişilik seçici - SERVER-SIDE RENDERING -->
+            <!-- Kişilik seçici -->
             <div class="personality-selector">
                 <select name="personality" class="personality-select" required>
                     <option value="">Kişilik Seçin...</option>
                     <option th:each="personality : ${personalities}"
                             th:value="${personality.key}"
-                            th:text="${personality.value.name}"
-                            th:data-key="${personality.key}">
+                            th:text="${personality.value.name}">
                     </option>
                 </select>
             </div>
@@ -80,7 +96,7 @@
                 <button type="submit"><i class="fas fa-paper-plane"></i></button>
             </div>
 
-            <!-- Kişilik seçici - SERVER-SIDE RENDERING -->
+            <!-- Kişilik seçici -->
             <div class="personality-selector">
                 <select name="personality" class="personality-select">
                     <option value="">Mevcut Kişiliği Kullan</option>

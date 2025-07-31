@@ -132,7 +132,7 @@ public class ChatViewController {
             // Mesaj geçmişini al
             List<Message> previousMessages = chatService.getMessagesByChatId(id);
 
-            // AI'dan cevap al - HER ZAMAN personality ile
+            // AI'dan cevap al
             String personalityPrompt = personalityService.getPersonalityPrompt(currentPersonality);
             System.out.println("Selected personality: " + currentPersonality);
             System.out.println("Personality prompt: " + personalityPrompt);
