@@ -1,25 +1,26 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Psikosys</title>
     <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
     <link rel="icon" type="image/x-icon" th:href="@{/images/favicon.ico}" />
     <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
 </head>
 <body>
-
+<!-- Sidebar -->
 <div class="sidebar">
     <h2>Psikosys</h2>
 
     <div class="new-chat-button">
         <a href="/chat">
-            <button type="button">New Chat</button>
+            <button type="button">Yeni Sohbet</button>
         </a>
     </div>
 
     <div th:if="${userChats != null && !userChats.isEmpty()}">
-        <div class="sidebar-section">Chats</div>
+        <div class="sidebar-section">Sohbetler</div>
 
         <a th:each="userChat : ${userChats}"
            th:href="@{'/chat/' + ${userChat.id}}"
@@ -29,7 +30,7 @@
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                 </svg>
             </div>
-            <span th:text="${userChat.title != null} ? ${userChat.title} : 'Chat ' + ${userChat.createdAt}">Chat Title</span>
+            <span th:text="${userChats.size() > 0 && userChat.title != null} ? ${userChat.title} : 'Sohbet ' + ${userChat.createdAt}">Sohbet Başlığı</span>
         </a>
     </div>
 </div>
@@ -37,27 +38,63 @@
 <!-- Main content area -->
 <div class="chat-container">
     <div class="chat-header">
-        <!-- Chat title here -->
         <h2 th:text="${chat != null && chat.title != null} ? ${chat.title} : 'Psikosys'">Psikosys</h2>
     </div>
 
     <div class="chat-history">
         <div th:if="${messages != null}">
-            <div th:each="message : ${messages}" th:class="${message.isUser} ? 'user-message' : 'ai-message'"
+            <div th:each="message : ${messages}"
+                 th:class="${message.isUser} ? 'message user-message' : 'message ai-message'"
                  th:utext="${message.content}">
             </div>
         </div>
     </div>
 
+    <!-- Yeni chat formu -->
     <form th:if="${chatId == null}" class="chat-form" th:action="@{/chat}" method="post">
-        <input type="text" name="question" class="chat-input" placeholder="Ask anything..." required>
-        <button type="submit">&uarr;</button>
+        <div class="chat-input-wrapper">
+            <div class="chat-input-group">
+                <textarea name="question" class="chat-input" placeholder="Herhangi bir şey sor..." required></textarea>
+                <button type="submit"><i class="fas fa-paper-plane"></i></button>
+            </div>
+
+            <!-- Kişilik seçici - SERVER-SIDE RENDERING -->
+            <div class="personality-selector">
+                <select name="personality" class="personality-select" required>
+                    <option value="">Kişilik Seçin...</option>
+                    <option th:each="personality : ${personalities}"
+                            th:value="${personality.key}"
+                            th:text="${personality.value.name}"
+                            th:data-key="${personality.key}">
+                    </option>
+                </select>
+            </div>
+        </div>
     </form>
 
+    <!-- Mevcut chat formu -->
     <form th:if="${chatId != null}" class="chat-form" th:action="@{'/chat/' + ${chatId}}" method="post">
-        <input type="text" name="question" class="chat-input" placeholder="Ask anything..." required>
-        <button type="submit">&uarr;</button>
+        <div class="chat-input-wrapper">
+            <div class="chat-input-group">
+                <textarea name="question" class="chat-input" placeholder="Herhangi bir şey sor..." required></textarea>
+                <button type="submit"><i class="fas fa-paper-plane"></i></button>
+            </div>
+
+            <!-- Kişilik seçici - SERVER-SIDE RENDERING -->
+            <div class="personality-selector">
+                <select name="personality" class="personality-select">
+                    <option value="">Mevcut Kişiliği Kullan</option>
+                    <option th:each="personality : ${personalities}"
+                            th:value="${personality.key}"
+                            th:text="${personality.value.name}"
+                            th:selected="${selectedPersonality != null && selectedPersonality == personality.key}">
+                    </option>
+                </select>
+            </div>
+        </div>
     </form>
 </div>
+
+<script th:src="@{/js/chat.js}"></script>
 </body>
 </html>

@@ -1,13 +1,9 @@
 package com.atlas.Psikosys.service;
 
-import com.atlas.Psikosys.entity.Chat;
 import com.atlas.Psikosys.entity.Message;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -26,40 +22,43 @@ public class AIService {
     }
 
     /**
-     * Returns AI response for a single message (used for initial messages).
+     * Returns HTML-formatted response from AI for a single message with specified personality.
      */
-    public String getAIResponse(String question) throws IOException {
-        String promptTemplate = getPersonaPrompt();
-        Prompt prompt = new PromptTemplate(promptTemplate).create(Map.of("message", question));
-        return callAIAndCleanResponse(prompt.toString());
+    public String getHtmlResponseWithPersonality(String question, String personalityPrompt) throws IOException {
+        if (personalityPrompt == null || personalityPrompt.trim().isEmpty()) {
+            throw new IllegalArgumentException("Personality prompt cannot be null or empty");
+        }
+
+        System.out.println("=== AI SERVICE DEBUG ===");
+        System.out.println("Question: " + question);
+        System.out.println("Original prompt: " + personalityPrompt);
+
+        // {message} placeholder'ını kontrol et
+        if (!personalityPrompt.contains("{message}")) {
+            System.out.println("UYARI: Prompt'ta {message} placeholder'ı yok!");
+            personalityPrompt = personalityPrompt + "\n\nUser message: {message}";
+        }
+
+        Prompt prompt = new PromptTemplate(personalityPrompt).create(Map.of("message", question));
+        String finalPrompt = prompt.toString();
+        System.out.println("Final prompt sent to AI: " + finalPrompt);
+
+        String response = callAIAndCleanResponse(finalPrompt);
+        System.out.println("AI Response: " + response);
+
+        return htmlService.markdownToHtml(response);
     }
 
     /**
-     * Returns HTML-formatted response from AI for a single message.
+     * Returns HTML-formatted response from AI based on message history and personality.
      */
-    public String getHtmlResponse(String question) throws IOException {
-        return htmlService.markdownToHtml(getAIResponse(question));
-    }
+    public String getHtmlResponseWithMessageHistoryAndPersonality(List<Message> messages, String newQuestion,
+                                                                  String personalityPrompt, int maxMessages) throws IOException {
+        if (personalityPrompt == null || personalityPrompt.trim().isEmpty()) {
+            throw new IllegalArgumentException("Personality prompt cannot be null or empty");
+        }
 
-    /**
-     * Generates a short title for a new chat.
-     */
-    public String generateChatTitle(String question) throws IOException {
-        String titlePrompt = """
-        You are a wise Jungian therapist. Create a concise (≤30 characters) chat title \
-        summarizing this message. Only return the title, no extra explanation:
-        \"%s\"""".formatted(question);
-        // promptTemplate yerine direkt şablon string gönderiyoruz
-        Prompt prompt = new PromptTemplate(titlePrompt).create(Map.of());
-        String title = callAIAndCleanResponse(prompt.toString());
-        return title.length() > 30 ? title.substring(0, 30) : title;
-    }
-
-    /**
-     * Returns HTML-formatted response from AI based on a given message list.
-     */
-    public String getHtmlResponseWithMessageHistory(List<Message> messages, String newQuestion, int maxMessages) throws IOException {
-        StringBuilder history = new StringBuilder(getPersonaPrompt()).append("\n\n");
+        StringBuilder history = new StringBuilder(personalityPrompt).append("\n\n");
 
         if (messages != null && !messages.isEmpty()) {
             history.append("Recent conversation:\n");
@@ -80,26 +79,17 @@ public class AIService {
     }
 
     /**
-     * Loads and returns persona prompt from JSON, using default 'Jungian'.
+     * Generates a short title for a new chat.
      */
-    private String getPersonaPrompt() throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Resource resource = new ClassPathResource("personalities.json");
-
-        if (!resource.exists()) {
-            throw new IOException("File 'personalities.json' not found.");
-        }
-
-        Map<String, Map<String, String>> personalities = objectMapper.readValue(resource.getInputStream(), Map.class);
-        String prompt = personalities.getOrDefault("Jungian", Map.of()).get("prompt");
-
-        if (prompt == null || prompt.isBlank()) {
-            throw new IOException("'Jungian' prompt is missing or empty in personalities.json");
-        }
-
-        return prompt;
+    public String generateChatTitle(String question) throws IOException {
+        String titlePrompt = """
+        You are a wise Jungian therapist. Create a concise (≤30 characters) chat title \
+        summarizing this message. Only return the title, no extra explanation:
+        \"%s\"""".formatted(question);
+        Prompt prompt = new PromptTemplate(titlePrompt).create(Map.of());
+        String title = callAIAndCleanResponse(prompt.toString());
+        return title.length() > 30 ? title.substring(0, 30) : title;
     }
-
 
     /**
      * Calls the AI model and cleans the raw response.

@@ -21,6 +21,8 @@ public class Chat {
     @Column(name = "title")
     private String title;
 
+    private String selectedPersonality;
+
     @Column(name = "created_at")
     private LocalDate createdAt;
 
@@ -39,6 +41,12 @@ public class Chat {
     }
 
     // getters
+
+
+    public String getSelectedPersonality() {
+        return selectedPersonality;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -60,6 +68,11 @@ public class Chat {
     }
 
     // setter
+
+
+    public void setSelectedPersonality(String selectedPersonality) {
+        this.selectedPersonality = selectedPersonality;
+    }
 
     public void setTitle(String title) {
         this.title = title;

@@ -22,7 +22,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(registry -> {
-                    registry.requestMatchers("/", "/css/**").permitAll();
+                    registry.requestMatchers("/", "/css/**", "/js/**").permitAll();
                     registry.anyRequest().authenticated();
                 })
                 // Configure OAuth2 login functionality

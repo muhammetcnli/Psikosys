@@ -51,6 +51,10 @@ public class ChatService {
         return chatRepository.save(chat);
     }
 
+    public void saveChat(Chat chat) {
+        chatRepository.save(chat);
+    }
+
     /**
      * Finds a chat by its ID.
      * @param id The UUID of the chat.
@@ -96,19 +100,23 @@ public class ChatService {
         message.setChat(chat);
         message.setIsUser(isUser);
 
-        // Generate a title for the chat if it's the first message
-        if (isUser && chat.getMessages().isEmpty()) {
-            try {
+        // Önce message'ı kaydet
+        messageRepository.save(message);
 
+        // Sonra chat'e ekle
+        chat.getMessages().add(message);
+
+        // Generate a title for the chat if it's the first user message
+        if (isUser && chat.getMessages().size() == 1) {
+            try {
                 String title = aiService.generateChatTitle(content);
                 chat.setTitle(title);
+                chatRepository.save(chat);
             } catch (Exception e) {
                 chat.setTitle("Chat " + LocalDate.now());
+                chatRepository.save(chat);
             }
         }
-
-        chat.getMessages().add(message);
-        chatRepository.save(chat);
     }
 
     /**
@@ -128,7 +136,12 @@ public class ChatService {
     }
 
     public List<Message> getMessagesByChatId(UUID chatId) {
-        // Message repository'nizde bu method olması gerekiyor
         return messageRepository.findByChatIdOrderByCreatedAtAsc(chatId);
+    }
+
+    public void updateChatPersonality(UUID chatId, String personality) {
+        Chat chat = findChatById(chatId);
+        chat.setSelectedPersonality(personality);
+        chatRepository.save(chat);
     }
 }

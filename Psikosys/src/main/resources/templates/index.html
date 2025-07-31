@@ -1,36 +1,84 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Psikosys</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{app.title}">Psikosys</title>
     <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
     <link rel="icon" type="image/x-icon" th:href="@{/images/favicon.ico}"/>
     <link rel="stylesheet" th:href="@{/css/style.css}" />
-    <style>
-        .index-container {
-            margin: auto;
-            padding: 40px;
-            text-align: center;
-        }
-
-        .index-container h1 {
-            color: #4a6fa5;
-            margin-bottom: 20px;
-        }
-
-        .index-container a {
-            display: block;
-            margin-bottom: 20px;
-            color: #333;
-            font-size: 16px;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/home.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
 </head>
 <body>
-<div class="index-container">
-    <h1>Welcome to Psikosys</h1>
-    <a>Simple page for now, you can enter chat page</a>
-    <button onclick="window.location.href='/chat'">Go to Chat</button>
+<div class="home-container">
+    <nav class="home-nav">
+        <div class="logo">
+            <h1 th:text="#{app.title}">Psikosys</h1>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#features" th:text="#{app.nav.features}">Özellikler</a></li>
+            <li><a href="#about" th:text="#{app.nav.about}">Hakkında</a></li>
+            <li><a href="/chat" class="nav-button" th:text="#{app.nav.chat}">Sohbete Başla</a></li>
+            <li class="language-switcher">
+                <button onclick="changeLanguage('tr')" class="language-btn" id="tr-btn">TR</button>
+                <button onclick="changeLanguage('en')" class="language-btn" id="en-btn">EN</button>
+            </li>
+        </ul>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1 th:text="#{app.hero.title}">Psikosys ile Yapay Zeka Destekli Sohbet</h1>
+            <p th:text="#{app.hero.subtitle}">Kişiselleştirilmiş sohbet deneyimi ile yanınızda olacak yapay zeka asistanı</p>
+            <div class="hero-buttons">
+                <button class="primary-button" onclick="window.location.href='/chat'" th:text="#{app.button.start}">Hemen Başla</button>
+                <button class="secondary-button" onclick="scrollToFeatures()" th:text="#{app.button.more}">Daha Fazla Bilgi</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <h2 th:text="#{app.features}">Özelliklerimiz</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-comment-dots feature-icon"></i>
+                <h3 th:text="#{app.feature.chat}">Akıllı Sohbet</h3>
+                <p th:text="#{app.feature.chat.desc}">Doğal dil anlama yetenekleri ile sizinle anlamlı konuşmalar yapabilir.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-brain feature-icon"></i>
+                <h3 th:text="#{app.feature.personalities}">Farklı Kişilikler</h3>
+                <p th:text="#{app.feature.personalities.desc}">İhtiyacınıza göre farklı sohbet kişilikleri arasında geçiş yapabilirsiniz.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-lock feature-icon"></i>
+                <h3 th:text="#{app.feature.secure}">Güvenli İletişim</h3>
+                <p th:text="#{app.feature.secure.desc}">Tüm sohbetleriniz güvenle saklanır ve korunur.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-history feature-icon"></i>
+                <h3 th:text="#{app.feature.history}">Sohbet Geçmişi</h3>
+                <p th:text="#{app.feature.history.desc}">Önceki konuşmalarınıza kolayca erişebilirsiniz.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about-section">
+        <h2 th:text="#{app.about}">Psikosys Hakkında</h2>
+        <p th:text="#{app.about.desc}">Psikosys, kullanıcılarına kişiselleştirilmiş bir sohbet deneyimi sunmak için tasarlanmış yapay zeka destekli bir platformdur. Farklı ihtiyaçlara göre uyarlanabilen asistanımız, her zaman yanınızda olmak için geliştirilmiştir.</p>
+    </section>
+
+    <footer class="home-footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Psikosys. <span th:text="#{app.copyright}">Tüm hakları saklıdır.</span></p>
+            <div class="social-links">
+                <a href="https://github.com/muhammetcnli/Psikosys" target="_blank"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </footer>
 </div>
+
+<script th:src="@{/js/home.js}"></script>
 </body>
 </html>
