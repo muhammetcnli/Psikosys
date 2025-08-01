@@ -22,9 +22,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(registry -> {
-                    registry.requestMatchers("/", "/css/**", "/js/**").permitAll();
+                    registry.requestMatchers("/", "/css/**", "/js/**", "/images/**", "/change-language").permitAll();
                     registry.anyRequest().authenticated();
                 })
+                .csrf(csrf ->
+                        csrf.ignoringRequestMatchers("/change-language")
+                )
                 // Configure OAuth2 login functionality
                 .oauth2Login(oauth2 ->
                         // Customize the userInfo endpoint processing
@@ -38,7 +41,5 @@ public class SecurityConfig {
                 .formLogin(Customizer.withDefaults());
 
         return http.build();
-
-
     }
 }

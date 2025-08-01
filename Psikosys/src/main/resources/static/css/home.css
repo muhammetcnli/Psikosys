@@ -62,29 +62,35 @@
 /* Dil değiştirici için stil */
 .language-switcher {
     display: flex;
-    align-items: center;
+    gap: 5px;
 }
 
 .language-btn {
     background-color: transparent;
-    color: #444;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    padding: 5px 8px;
-    margin: 0 2px;
-    font-size: 12px;
+    color: #4a6fa5;
+    border: 1px solid #4a6fa5;
+    padding: 6px 12px;
+    margin: 0;
+    border-radius: 15px;
     cursor: pointer;
     transition: all 0.2s;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .language-btn:hover {
     background-color: #f0f4f8;
+    transform: translateY(-1px);
 }
 
 .language-btn.active {
     background-color: #4a6fa5;
     color: white;
-    border-color: #4a6fa5;
+    box-shadow: 0 2px 4px rgba(74, 111, 165, 0.3);
+}
+
+.language-btn.active:hover {
+    background-color: #3a5a8a;
 }
 
 /* Hero bölümü */

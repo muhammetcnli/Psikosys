@@ -120,6 +120,35 @@ body {
     left: 0;
 }
 
+/* Dil seçici */
+.language-selector {
+    padding: 10px 20px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.language-selector select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    background-color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.language-selector select:hover {
+    background-color: #f6f8fa;
+    border-color: #bdc1c6;
+}
+
+.language-selector select:focus {
+    border-color: #4a6fa5;
+    box-shadow: 0 0 0 1px rgba(74, 111, 165, 0.15);
+}
+
 .profile-button span {
     font-weight: 500;
     font-size: 14px;

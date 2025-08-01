@@ -33,9 +33,11 @@ public class Oauth2UserInfoDto {
 
     private Integer limitResetDate;
 
+    private String preferredLanguage;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
-    private Role role; // Eğer istersen burada sadece Role adı (String) da olabilir
+    private Role role;
 }

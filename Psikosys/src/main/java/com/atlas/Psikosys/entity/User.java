@@ -45,6 +45,9 @@ public class User {
     @Column
     private String password;
 
+    @Column(name = "preferred_language", length = 5)
+    private String preferredLanguage = "tr"; // default Türkçe
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private Role role;

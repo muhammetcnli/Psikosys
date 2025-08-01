@@ -5,7 +5,9 @@ import com.atlas.Psikosys.entity.Message;
 import com.atlas.Psikosys.entity.User;
 import com.atlas.Psikosys.service.AIService;
 import com.atlas.Psikosys.service.ChatService;
+import com.atlas.Psikosys.service.LanguageService;
 import com.atlas.Psikosys.service.PersonalityService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
@@ -20,29 +22,31 @@ public class ChatViewController {
     private final ChatService chatService;
     private final AIService aiService;
     private final PersonalityService personalityService;
+    private final LanguageService languageService;
 
     @Autowired
-    public ChatViewController(ChatService chatService, AIService aiService, PersonalityService personalityService) {
+    public ChatViewController(ChatService chatService, AIService aiService,
+                              PersonalityService personalityService, LanguageService languageService) {
         this.chatService = chatService;
         this.aiService = aiService;
         this.personalityService = personalityService;
+        this.languageService = languageService;
     }
 
     @GetMapping("/chat")
-    public String chat(OAuth2AuthenticationToken token, Model model) {
+    public String chat(OAuth2AuthenticationToken token, Model model, HttpServletRequest request) {
         try {
             User user = chatService.getCurrentUser();
+            String currentLanguage = languageService.getCurrentLanguage(request);
 
-            // OAuth'dan kullanıcı bilgilerini al
             if (token != null) {
-
-                System.out.println(token.getPrincipal().getAttributes());
                 model.addAttribute("userName", token.getPrincipal().getAttributes().get("name"));
                 model.addAttribute("userPhoto", token.getPrincipal().getAttribute("picture"));
             }
 
             model.addAttribute("userChats", user.getChats());
             model.addAttribute("personalities", personalityService.getAllPersonalities());
+            model.addAttribute("currentLang", currentLanguage);
             return "chat";
         } catch (Exception e) {
             model.addAttribute("error", "No user info.");
@@ -61,18 +65,13 @@ public class ChatViewController {
 
         Chat chat = chatService.createChat();
 
-        // Kişiliği belirle - eğer seçilmemişse default "Jungian" kullan
         String selectedPersonality = (personality != null && !personality.isEmpty()) ? personality : "Jungian";
         System.out.println("Kullanılacak personality: " + selectedPersonality);
 
-        // Chat'e personality'yi kaydet
         chatService.updateChatPersonality(chat.getId(), selectedPersonality);
-
-        // Kullanıcı mesajını ekle
         chatService.addMessageToChat(chat.getId(), question, true);
 
         try {
-            // Personality prompt'u al ve AI'dan cevap iste
             String personalityPrompt = personalityService.getPersonalityPrompt(selectedPersonality);
             System.out.println("Personality prompt: " + personalityPrompt);
 
@@ -89,19 +88,19 @@ public class ChatViewController {
     }
 
     @GetMapping("/chat/{id}")
-    public String viewChat(@PathVariable(value = "id") UUID id, OAuth2AuthenticationToken token, Model model) {
+    public String viewChat(@PathVariable(value = "id") UUID id, OAuth2AuthenticationToken token,
+                           Model model, HttpServletRequest request) {
         try {
             User user = chatService.getCurrentUser();
             Chat chat = chatService.findChatByIdWithOrderedMessages(id);
+            String currentLanguage = languageService.getCurrentLanguage(request);
 
-            // Chat sahibinin kontrolü
             if (!chat.getUser().getId().equals(user.getId())) {
                 return "redirect:/chat";
             }
 
             List<Message> messages = chatService.getMessagesByChatId(id);
 
-            // OAuth'dan kullanıcı bilgilerini al
             if (token != null) {
                 model.addAttribute("userName", token.getPrincipal().getAttributes().get("name"));
                 model.addAttribute("userPhoto", token.getPrincipal().getAttribute("picture"));
@@ -113,6 +112,7 @@ public class ChatViewController {
             model.addAttribute("messages", messages);
             model.addAttribute("personalities", personalityService.getAllPersonalities());
             model.addAttribute("selectedPersonality", chat.getSelectedPersonality());
+            model.addAttribute("currentLang", currentLanguage);
 
             return "chat";
         } catch (Exception e) {
@@ -127,28 +127,21 @@ public class ChatViewController {
             @RequestParam("question") String question,
             @RequestParam(value = "personality", required = false) String personality) {
         try {
-            // Mevcut personality'yi belirle
             String currentPersonality = personality;
             if (currentPersonality == null || currentPersonality.isEmpty()) {
                 Chat currentChat = chatService.findChatById(id);
                 currentPersonality = currentChat.getSelectedPersonality();
             }
 
-            // Hala null ise default "Jungian" kullan
             if (currentPersonality == null || currentPersonality.isEmpty()) {
                 currentPersonality = "Jungian";
             }
 
-            // Personality'yi güncelle
             chatService.updateChatPersonality(id, currentPersonality);
-
-            // Kullanıcı mesajını ekle
             chatService.addMessageToChat(id, question, true);
 
-            // Mesaj geçmişini al
             List<Message> previousMessages = chatService.getMessagesByChatId(id);
 
-            // AI'dan cevap al
             String personalityPrompt = personalityService.getPersonalityPrompt(currentPersonality);
             System.out.println("Selected personality: " + currentPersonality);
             System.out.println("Personality prompt: " + personalityPrompt);

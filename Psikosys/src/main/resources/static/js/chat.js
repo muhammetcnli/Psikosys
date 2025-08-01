@@ -33,3 +33,38 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Dil değiştirme fonksiyonu
+function changeLanguage() {
+    const select = document.getElementById('languageSelect');
+    const selectedLang = select.value;
+
+    // CSRF token'ı al
+    const token = document.querySelector('meta[name="_csrf"]');
+    const header = document.querySelector('meta[name="_csrf_header"]');
+
+    const headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+    };
+
+    // CSRF token varsa ekle
+    if (token && header) {
+        headers[header.getAttribute('content')] = token.getAttribute('content');
+    }
+
+    fetch('/change-language', {
+        method: 'POST',
+        headers: headers,
+        body: 'language=' + encodeURIComponent(selectedLang)
+    })
+        .then(response => {
+            if (response.ok) {
+                location.reload(); // Sayfayı yenile
+            } else {
+                console.error('Dil değiştirme başarısız:', response.status);
+            }
+        })
+        .catch(error => {
+            console.error('Dil değiştirme hatası:', error);
+        });
+}

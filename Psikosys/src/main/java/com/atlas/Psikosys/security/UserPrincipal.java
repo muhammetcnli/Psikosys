@@ -47,6 +47,10 @@ public class UserPrincipal implements OAuth2User, UserDetails {
         return id;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     @Override
     public String getPassword() {
         return password;
@@ -69,6 +73,11 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
         return true;
     }
 

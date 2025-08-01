@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${currentLang != null ? currentLang : 'tr'}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Psikosys</title>
     <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
     <link rel="icon" type="image/x-icon" th:href="@{/images/favicon.ico}" />
@@ -13,14 +15,22 @@
 <div class="sidebar">
     <h2>Psikosys</h2>
 
+    <!-- Dil seçici eklendi -->
+    <div class="language-selector">
+        <select id="languageSelect" onchange="changeLanguage()">
+            <option value="tr" th:selected="${currentLang == 'tr'}">🇹🇷 Türkçe</option>
+            <option value="en" th:selected="${currentLang == 'en'}">🇬🇧 English</option>
+        </select>
+    </div>
+
     <div class="new-chat-button">
         <a href="/chat">
-            <button type="button">Yeni Sohbet</button>
+            <button type="button" th:text="${currentLang == 'en'} ? 'New Chat' : 'Yeni Sohbet'">Yeni Sohbet</button>
         </a>
     </div>
 
     <div th:if="${userChats != null && !userChats.isEmpty()}">
-        <div class="sidebar-section">Sohbetler</div>
+        <div class="sidebar-section" th:text="${currentLang == 'en'} ? 'Chats' : 'Sohbetler'">Sohbetler</div>
 
         <a th:each="userChat : ${userChats}"
            th:href="@{'/chat/' + ${userChat.id}}"
@@ -30,7 +40,7 @@
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                 </svg>
             </div>
-            <span th:text="${userChats.size() > 0 && userChat.title != null} ? ${userChat.title} : 'Sohbet ' + ${userChat.createdAt}">Sohbet Başlığı</span>
+            <span th:text="${userChats.size() > 0 && userChat.title != null} ? ${userChat.title} : (${currentLang == 'en'} ? 'Chat ' : 'Sohbet ') + ${userChat.createdAt}">Sohbet Başlığı</span>
         </a>
     </div>
 
@@ -48,7 +58,7 @@
                        th:style="${(user != null and #strings.length(userPhoto) > 0) ? 'display:none;' : 'display:flex;'}">
                     </i>
                 </div>
-                <span th:text="${userName != null and #strings.length(userName) > 0} ? ${userName} : 'Profil'">Profil</span>
+                <span th:text="${userName != null and #strings.length(userName) > 0} ? ${userName} : (${currentLang == 'en'} ? 'Profile' : 'Profil')">Profil</span>
             </div>
         </a>
     </div>
@@ -73,14 +83,15 @@
     <form th:if="${chatId == null}" class="chat-form" th:action="@{/chat}" method="post">
         <div class="chat-input-wrapper">
             <div class="chat-input-group">
-                <textarea name="question" class="chat-input" placeholder="Herhangi bir şey sor..." required></textarea>
+                <textarea name="question" class="chat-input"
+                          th:placeholder="${currentLang == 'en'} ? 'Ask anything...' : 'Herhangi bir şey sor...'" required></textarea>
                 <button type="submit"><i class="fas fa-paper-plane"></i></button>
             </div>
 
             <!-- Kişilik seçici -->
             <div class="personality-selector">
                 <select name="personality" class="personality-select" required>
-                    <option value="">Kişilik Seçin...</option>
+                    <option value="" th:text="${currentLang == 'en'} ? 'Select Personality...' : 'Kişilik Seçin...'">Kişilik Seçin...</option>
                     <option th:each="personality : ${personalities}"
                             th:value="${personality.key}"
                             th:text="${personality.value.name}">
@@ -94,14 +105,15 @@
     <form th:if="${chatId != null}" class="chat-form" th:action="@{'/chat/' + ${chatId}}" method="post">
         <div class="chat-input-wrapper">
             <div class="chat-input-group">
-                <textarea name="question" class="chat-input" placeholder="Herhangi bir şey sor..." required></textarea>
+                <textarea name="question" class="chat-input"
+                          th:placeholder="${currentLang == 'en'} ? 'Ask anything...' : 'Herhangi bir şey sor...'" required></textarea>
                 <button type="submit"><i class="fas fa-paper-plane"></i></button>
             </div>
 
             <!-- Kişilik seçici -->
             <div class="personality-selector">
                 <select name="personality" class="personality-select">
-                    <option value="">Mevcut Kişiliği Kullan</option>
+                    <option value="" th:text="${currentLang == 'en'} ? 'Use Current Personality' : 'Mevcut Kişiliği Kullan'">Mevcut Kişiliği Kullan</option>
                     <option th:each="personality : ${personalities}"
                             th:value="${personality.key}"
                             th:text="${personality.value.name}"

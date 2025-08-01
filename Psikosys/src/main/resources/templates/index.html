@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${currentLang != null ? currentLang : 'tr'}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="#{app.title}">Psikosys</title>
     <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
@@ -14,64 +16,70 @@
 <div class="home-container">
     <nav class="home-nav">
         <div class="logo">
-            <h1 th:text="#{app.title}">Psikosys</h1>
+            <h1 th:text="${currentLang == 'en'} ? 'Psikosys' : 'Psikosys'">Psikosys</h1>
         </div>
         <ul class="nav-links">
-            <li><a href="#features" th:text="#{app.nav.features}">Özellikler</a></li>
-            <li><a href="#about" th:text="#{app.nav.about}">Hakkında</a></li>
-            <li><a href="/chat" class="nav-button" th:text="#{app.nav.chat}">Sohbete Başla</a></li>
+            <li><a href="#features" th:text="${currentLang == 'en'} ? 'Features' : 'Özellikler'">Özellikler</a></li>
+            <li><a href="#about" th:text="${currentLang == 'en'} ? 'About' : 'Hakkında'">Hakkında</a></li>
+            <li><a href="/chat" class="nav-button" th:text="${currentLang == 'en'} ? 'Start Chat' : 'Sohbete Başla'">Sohbete Başla</a></li>
             <li class="language-switcher">
-                <button onclick="changeLanguage('tr')" class="language-btn" id="tr-btn">TR</button>
-                <button onclick="changeLanguage('en')" class="language-btn" id="en-btn">EN</button>
+                <button onclick="changeLanguageHome('tr')"
+                        class="language-btn"
+                        th:classappend="${currentLang == 'tr'} ? 'active' : ''"
+                        id="tr-btn">TR</button>
+                <button onclick="changeLanguageHome('en')"
+                        class="language-btn"
+                        th:classappend="${currentLang == 'en'} ? 'active' : ''"
+                        id="en-btn">EN</button>
             </li>
         </ul>
     </nav>
 
     <section class="hero">
         <div class="hero-content">
-            <h1 th:text="#{app.hero.title}">Psikosys ile Yapay Zeka Destekli Sohbet</h1>
-            <p th:text="#{app.hero.subtitle}">Kişiselleştirilmiş sohbet deneyimi ile yanınızda olacak yapay zeka asistanı</p>
+            <h1 th:text="${currentLang == 'en'} ? 'AI-Powered Chat with Psikosys' : 'Psikosys ile Yapay Zeka Destekli Sohbet'">Psikosys ile Yapay Zeka Destekli Sohbet</h1>
+            <p th:text="${currentLang == 'en'} ? 'AI assistant that will be with you with a personalized chat experience' : 'Kişiselleştirilmiş sohbet deneyimi ile yanınızda olacak yapay zeka asistanı'">Kişiselleştirilmiş sohbet deneyimi ile yanınızda olacak yapay zeka asistanı</p>
             <div class="hero-buttons">
-                <button class="primary-button" onclick="window.location.href='/chat'" th:text="#{app.button.start}">Hemen Başla</button>
-                <button class="secondary-button" onclick="scrollToFeatures()" th:text="#{app.button.more}">Daha Fazla Bilgi</button>
+                <button class="primary-button" onclick="window.location.href='/chat'" th:text="${currentLang == 'en'} ? 'Get Started' : 'Hemen Başla'">Hemen Başla</button>
+                <button class="secondary-button" onclick="scrollToFeatures()" th:text="${currentLang == 'en'} ? 'Learn More' : 'Daha Fazla Bilgi'">Daha Fazla Bilgi</button>
             </div>
         </div>
     </section>
 
     <section id="features" class="features">
-        <h2 th:text="#{app.features}">Özelliklerimiz</h2>
+        <h2 th:text="${currentLang == 'en'} ? 'Our Features' : 'Özelliklerimiz'">Özelliklerimiz</h2>
         <div class="features-grid">
             <div class="feature-card">
                 <i class="fas fa-comment-dots feature-icon"></i>
-                <h3 th:text="#{app.feature.chat}">Akıllı Sohbet</h3>
-                <p th:text="#{app.feature.chat.desc}">Doğal dil anlama yetenekleri ile sizinle anlamlı konuşmalar yapabilir.</p>
+                <h3 th:text="${currentLang == 'en'} ? 'Smart Chat' : 'Akıllı Sohbet'">Akıllı Sohbet</h3>
+                <p th:text="${currentLang == 'en'} ? 'Can have meaningful conversations with you with natural language understanding capabilities.' : 'Doğal dil anlama yetenekleri ile sizinle anlamlı konuşmalar yapabilir.'">Doğal dil anlama yetenekleri ile sizinle anlamlı konuşmalar yapabilir.</p>
             </div>
             <div class="feature-card">
                 <i class="fas fa-brain feature-icon"></i>
-                <h3 th:text="#{app.feature.personalities}">Farklı Kişilikler</h3>
-                <p th:text="#{app.feature.personalities.desc}">İhtiyacınıza göre farklı sohbet kişilikleri arasında geçiş yapabilirsiniz.</p>
+                <h3 th:text="${currentLang == 'en'} ? 'Different Personalities' : 'Farklı Kişilikler'">Farklı Kişilikler</h3>
+                <p th:text="${currentLang == 'en'} ? 'You can switch between different chat personalities according to your needs.' : 'İhtiyacınıza göre farklı sohbet kişilikleri arasında geçiş yapabilirsiniz.'">İhtiyacınıza göre farklı sohbet kişilikleri arasında geçiş yapabilirsiniz.</p>
             </div>
             <div class="feature-card">
                 <i class="fas fa-lock feature-icon"></i>
-                <h3 th:text="#{app.feature.secure}">Güvenli İletişim</h3>
-                <p th:text="#{app.feature.secure.desc}">Tüm sohbetleriniz güvenle saklanır ve korunur.</p>
+                <h3 th:text="${currentLang == 'en'} ? 'Secure Communication' : 'Güvenli İletişim'">Güvenli İletişim</h3>
+                <p th:text="${currentLang == 'en'} ? 'All your conversations are safely stored and protected.' : 'Tüm sohbetleriniz güvenle saklanır ve korunur.'">Tüm sohbetleriniz güvenle saklanır ve korunur.</p>
             </div>
             <div class="feature-card">
                 <i class="fas fa-history feature-icon"></i>
-                <h3 th:text="#{app.feature.history}">Sohbet Geçmişi</h3>
-                <p th:text="#{app.feature.history.desc}">Önceki konuşmalarınıza kolayca erişebilirsiniz.</p>
+                <h3 th:text="${currentLang == 'en'} ? 'Chat History' : 'Sohbet Geçmişi'">Sohbet Geçmişi</h3>
+                <p th:text="${currentLang == 'en'} ? 'You can easily access your previous conversations.' : 'Önceki konuşmalarınıza kolayca erişebilirsiniz.'">Önceki konuşmalarınıza kolayca erişebilirsiniz.</p>
             </div>
         </div>
     </section>
 
     <section id="about" class="about-section">
-        <h2 th:text="#{app.about}">Psikosys Hakkında</h2>
-        <p th:text="#{app.about.desc}">Psikosys, kullanıcılarına kişiselleştirilmiş bir sohbet deneyimi sunmak için tasarlanmış yapay zeka destekli bir platformdur. Farklı ihtiyaçlara göre uyarlanabilen asistanımız, her zaman yanınızda olmak için geliştirilmiştir.</p>
+        <h2 th:text="${currentLang == 'en'} ? 'About Psikosys' : 'Psikosys Hakkında'">Psikosys Hakkında</h2>
+        <p th:text="${currentLang == 'en'} ? 'Psikosys is an AI-powered platform designed to provide users with a personalized chat experience. Our assistant, which can be adapted to different needs, has been developed to always be by your side.' : 'Psikosys, kullanıcılarına kişiselleştirilmiş bir sohbet deneyimi sunmak için tasarlanmış yapay zeka destekli bir platformdur. Farklı ihtiyaçlara göre uyarlanabilen asistanımız, her zaman yanınızda olmak için geliştirilmiştir.'">Psikosys, kullanıcılarına kişiselleştirilmiş bir sohbet deneyimi sunmak için tasarlanmış yapay zeka destekli bir platformdur. Farklı ihtiyaçlara göre uyarlanabilen asistanımız, her zaman yanınızda olmak için geliştirilmiştir.</p>
     </section>
 
     <footer class="home-footer">
         <div class="footer-content">
-            <p>&copy; 2025 Psikosys. <span th:text="#{app.copyright}">Tüm hakları saklıdır.</span></p>
+            <p>&copy; 2025 Psikosys. <span th:text="${currentLang == 'en'} ? 'All rights reserved.' : 'Tüm hakları saklıdır.'">Tüm hakları saklıdır.</span></p>
             <div class="social-links">
                 <a href="https://github.com/muhammetcnli/Psikosys" target="_blank"><i class="fab fa-github"></i></a>
             </div>

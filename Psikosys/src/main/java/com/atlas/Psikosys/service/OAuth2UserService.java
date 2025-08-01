@@ -1,105 +1,101 @@
 package com.atlas.Psikosys.service;
 
-import com.atlas.Psikosys.dto.Oauth2UserInfoDto;
-import com.atlas.Psikosys.entity.Role;
 import com.atlas.Psikosys.entity.User;
-import com.atlas.Psikosys.repository.RoleRepository;
 import com.atlas.Psikosys.repository.UserRepository;
-import com.atlas.Psikosys.security.UserPrincipal;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
 
 @Service
 public class OAuth2UserService extends DefaultOAuth2UserService {
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-
-    public OAuth2UserService(UserRepository userRepository, RoleRepository roleRepository) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-    }
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
-    public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) {
-        OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
-        return processOAuth2User(oAuth2UserRequest, oAuth2User);
-    }
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        OAuth2User oauth2User = super.loadUser(userRequest);
 
-    private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
-        String fullName = oAuth2User.getAttributes().get("name").toString();
-        String firstName = fullName;
-        String lastName = "";
+        String email = oauth2User.getAttribute("email");
+        String name = oauth2User.getAttribute("name");
+        String picture = oauth2User.getAttribute("picture");
 
-        if (fullName.contains(" ")) {
-            int lastSpaceIndex = fullName.lastIndexOf(" ");
-            firstName = fullName.substring(0, lastSpaceIndex);
-            lastName = fullName.substring(lastSpaceIndex + 1);
+        // Cookie'den dil tercihini al
+        String preferredLanguage = getCurrentLanguageFromCookie();
+
+        System.out.println("OAuth2 giriş - Email: " + email);
+        System.out.println("OAuth2 giriş - Cookie'deki dil: " + preferredLanguage);
+
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        if (user == null) {
+            // Yeni kullanıcı oluştur - cookie'deki dili kullan
+            user = User.builder()
+                    .email(email)
+                    .firstName(name) // User entity'sinde firstName var
+                    .picture(picture)
+                    .preferredLanguage(preferredLanguage) // Doğru field adı
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+
+            userRepository.save(user);
+            System.out.println("✅ Yeni kullanıcı oluşturuldu: " + email + " - Dil: " + preferredLanguage);
+        } else {
+            // Mevcut kullanıcı - sadece profil bilgilerini güncelle, dili KORUR
+            boolean updated = false;
+
+            if (name != null && !name.equals(user.getFirstName())) {
+                user.setFirstName(name);
+                updated = true;
+            }
+
+            if (picture != null && !picture.equals(user.getPicture())) {
+                user.setPicture(picture);
+                updated = true;
+            }
+
+            if (updated) {
+                user.setUpdatedAt(LocalDateTime.now());
+                userRepository.save(user);
+                System.out.println("✅ Mevcut kullanıcı güncellendi: " + email + " - Dil korundu: " + user.getPreferredLanguage());
+            } else {
+                System.out.println("✅ Mevcut kullanıcı giriş yaptı: " + email + " - Dil: " + user.getPreferredLanguage());
+            }
         }
 
-        Oauth2UserInfoDto userInfoDto = Oauth2UserInfoDto
-                .builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .providerId(oAuth2User.getAttributes().get("sub").toString()) // UUID yerine String olarak providerId
-                .email(oAuth2User.getAttributes().get("email").toString())
-                .picture(oAuth2User.getAttributes().get("picture").toString())
-                .provider(oAuth2UserRequest.getClientRegistration().getRegistrationId())
-                .build();
-
-        Optional<User> userOptional = userRepository.findByEmail(userInfoDto.getEmail());
-
-        User user = userOptional
-                .map(existingUser -> updateExistingUser(existingUser, userInfoDto))
-                .orElseGet(() -> registerNewUser(oAuth2UserRequest, userInfoDto));
-
-        return UserPrincipal.create(user, oAuth2User.getAttributes());
+        return oauth2User;
     }
 
-    private User registerNewUser(OAuth2UserRequest oAuth2UserRequest, Oauth2UserInfoDto userInfoDto) {
-        // Default role'ü veritabanından al, yoksa oluştur
-        Role defaultRole = roleRepository.findByName("ROLE_USER")
-                .orElseGet(() -> createDefaultRole());
+    // Cookie'den mevcut dil tercihini al
+    private String getCurrentLanguageFromCookie() {
+        try {
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            HttpServletRequest request = attributes.getRequest();
 
-        User user = User.builder()
-                .provider(userInfoDto.getProvider())
-                .providerId(userInfoDto.getProviderId())
-                .firstName(userInfoDto.getFirstName())
-                .lastName(userInfoDto.getLastName())
-                .email(userInfoDto.getEmail())
-                .picture(userInfoDto.getPicture())
-                .role(defaultRole)
-                .messageLimit(10) // Default message limit
-                .limitResetDate(1) // Default limit reset date
-                .build();
-
-        return userRepository.save(user);
-    }
-
-    private Role createDefaultRole() {
-        Role defaultRole = Role.builder()
-                .name("ROLE_USER")
-                .build();
-        return roleRepository.save(defaultRole);
-    }
-
-    private User updateExistingUser(User existingUser, Oauth2UserInfoDto userInfoDto) {
-        existingUser.setFirstName(userInfoDto.getFirstName());
-        existingUser.setLastName(userInfoDto.getLastName());
-        existingUser.setPicture(userInfoDto.getPicture());
-
-        // Provider bilgilerini güncelle (eğer boşsa)
-        if (existingUser.getProvider() == null) {
-            existingUser.setProvider(userInfoDto.getProvider());
-        }
-        if (existingUser.getProviderId() == null) {
-            existingUser.setProviderId(userInfoDto.getProviderId());
+            if (request.getCookies() != null) {
+                for (Cookie cookie : request.getCookies()) {
+                    if ("user_language".equals(cookie.getName())) {
+                        String language = cookie.getValue();
+                        System.out.println("🍪 Cookie'den dil bulundu: " + language);
+                        return language;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Cookie okuma hatası: " + e.getMessage());
         }
 
-        return userRepository.save(existingUser);
+        System.out.println("⚠️ Cookie'de dil bulunamadı, varsayılan 'tr' kullanılıyor");
+        return "tr"; // Varsayılan dil
     }
 }
