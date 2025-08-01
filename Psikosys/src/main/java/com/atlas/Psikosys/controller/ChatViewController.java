@@ -7,6 +7,7 @@ import com.atlas.Psikosys.service.AIService;
 import com.atlas.Psikosys.service.ChatService;
 import com.atlas.Psikosys.service.PersonalityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,9 +29,18 @@ public class ChatViewController {
     }
 
     @GetMapping("/chat")
-    public String chat(Model model) {
+    public String chat(OAuth2AuthenticationToken token, Model model) {
         try {
             User user = chatService.getCurrentUser();
+
+            // OAuth'dan kullanıcı bilgilerini al
+            if (token != null) {
+
+                System.out.println(token.getPrincipal().getAttributes());
+                model.addAttribute("userName", token.getPrincipal().getAttributes().get("name"));
+                model.addAttribute("userPhoto", token.getPrincipal().getAttribute("picture"));
+            }
+
             model.addAttribute("userChats", user.getChats());
             model.addAttribute("personalities", personalityService.getAllPersonalities());
             return "chat";
@@ -79,7 +89,7 @@ public class ChatViewController {
     }
 
     @GetMapping("/chat/{id}")
-    public String viewChat(@PathVariable(value = "id") UUID id, Model model) {
+    public String viewChat(@PathVariable(value = "id") UUID id, OAuth2AuthenticationToken token, Model model) {
         try {
             User user = chatService.getCurrentUser();
             Chat chat = chatService.findChatByIdWithOrderedMessages(id);
@@ -90,6 +100,12 @@ public class ChatViewController {
             }
 
             List<Message> messages = chatService.getMessagesByChatId(id);
+
+            // OAuth'dan kullanıcı bilgilerini al
+            if (token != null) {
+                model.addAttribute("userName", token.getPrincipal().getAttributes().get("name"));
+                model.addAttribute("userPhoto", token.getPrincipal().getAttribute("picture"));
+            }
 
             model.addAttribute("userChats", user.getChats());
             model.addAttribute("chat", chat);

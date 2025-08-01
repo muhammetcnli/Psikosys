@@ -39,14 +39,16 @@
         <a href="/profile" class="profile-link">
             <div class="profile-button">
                 <div class="profile-icon">
-                    <img th:if="${user != null and #strings.length(user.photo) > 0}"
-                         th:src="${user.photo}"
+                    <img th:if="${userPhoto != null}"
+                         th:src="${userPhoto}"
                          alt="Profil"
                          class="profile-photo"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <i class="fas fa-user" th:style="${user != null and #strings.length(user.photo) > 0} ? 'display: none;' : 'display: flex;'"></i>
+                    <i class="fas fa-user"
+                       th:style="${(user != null and #strings.length(userPhoto) > 0) ? 'display:none;' : 'display:flex;'}">
+                    </i>
                 </div>
-                <span th:text="${user != null and #strings.length(user.name) > 0} ? ${user.name} : 'Profil'">Profil</span>
+                <span th:text="${userName != null and #strings.length(userName) > 0} ? ${userName} : 'Profil'">Profil</span>
             </div>
         </a>
     </div>
