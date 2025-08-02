@@ -13,35 +13,46 @@
 <body>
 <!-- Sidebar -->
 <div class="sidebar">
+    <a href="/" class="sidebar-logo">
     <h2>Psikosys</h2>
+    </a>
 
-    <!-- Dil seçici eklendi -->
-    <div class="language-selector">
-        <select id="languageSelect" onchange="changeLanguage()">
-            <option value="tr" th:selected="${currentLang == 'tr'}">🇹🇷 Türkçe</option>
-            <option value="en" th:selected="${currentLang == 'en'}">🇬🇧 English</option>
-        </select>
-    </div>
-
+    <!-- Yeni Chat butonu -->
     <div class="new-chat-button">
         <a href="/chat">
             <button type="button" th:text="${currentLang == 'en'} ? 'New Chat' : 'Yeni Sohbet'">Yeni Sohbet</button>
         </a>
     </div>
 
+    <!-- Chat listesi -->
     <div th:if="${userChats != null && !userChats.isEmpty()}">
         <div class="sidebar-section" th:text="${currentLang == 'en'} ? 'Chats' : 'Sohbetler'">Sohbetler</div>
 
-        <a th:each="userChat : ${userChats}"
-           th:href="@{'/chat/' + ${userChat.id}}"
-           th:class="${chatId != null && chatId == userChat.id} ? 'sidebar-item active' : 'sidebar-item'">
-            <div class="sidebar-item-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
-            </div>
-            <span th:text="${userChats.size() > 0 && userChat.title != null} ? ${userChat.title} : (${currentLang == 'en'} ? 'Chat ' : 'Sohbet ') + ${userChat.createdAt}">Sohbet Başlığı</span>
-        </a>
+        <div th:each="userChat : ${userChats}">
+            <a th:href="@{'/chat/' + ${userChat.id}}"
+               th:class="${chatId != null && chatId == userChat.id} ? 'sidebar-item active' : 'sidebar-item'"
+               onclick="event.stopPropagation();">
+
+                <div class="sidebar-item-content">
+                    <div class="sidebar-item-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </div>
+                    <span class="sidebar-item-title"
+                          th:text="${userChat.title != null && !#strings.isEmpty(userChat.title)} ? ${userChat.title} : (${currentLang == 'en'} ? 'Chat ' : 'Sohbet ') + ${#temporals.format(userChat.createdAt, 'dd/MM')}">
+                        Sohbet Başlığı
+                    </span>
+                </div>
+
+                <button class="delete-chat-btn"
+                        type="button"
+                        th:data-chat-id="${userChat.id}"
+                        th:title="${currentLang == 'en'} ? 'Delete chat' : 'Sohbeti sil'">
+                    <i class="fas fa-times"></i>
+                </button>
+            </a>
+        </div>
     </div>
 
     <!-- Profil butonu -->
@@ -49,32 +60,57 @@
         <a href="/profile" class="profile-link">
             <div class="profile-button">
                 <div class="profile-icon">
-                    <img th:if="${userPhoto != null}"
+                    <img th:if="${userPhoto != null && !#strings.isEmpty(userPhoto)}"
                          th:src="${userPhoto}"
                          alt="Profil"
                          class="profile-photo"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <i class="fas fa-user"
-                       th:style="${(user != null and #strings.length(userPhoto) > 0) ? 'display:none;' : 'display:flex;'}">
+                       th:style="${(userPhoto != null and !#strings.isEmpty(userPhoto)) ? 'display:none;' : 'display:flex;'}">
                     </i>
                 </div>
-                <span th:text="${userName != null and #strings.length(userName) > 0} ? ${userName} : (${currentLang == 'en'} ? 'Profile' : 'Profil')">Profil</span>
+                <span th:text="${userName != null and !#strings.isEmpty(userName)} ? ${userName} : (${currentLang == 'en'} ? 'Profile' : 'Profil')">Profil</span>
             </div>
         </a>
     </div>
 </div>
 
+<!-- Geri kalan içerik aynı kalacak... -->
 <!-- Main content area -->
 <div class="chat-container">
     <div class="chat-header">
-        <h2 th:text="${chat != null && chat.title != null} ? ${chat.title} : 'Psikosys'">Psikosys</h2>
+        <h2 th:text="${chat != null && chat.title != null && !#strings.isEmpty(chat.title)} ? ${chat.title} : 'Psikosys'">Psikosys</h2>
     </div>
 
     <div class="chat-history">
-        <div th:if="${messages != null}">
+        <div th:if="${messages != null && !messages.isEmpty()}">
             <div th:each="message : ${messages}"
                  th:class="${message.isUser} ? 'message user-message' : 'message ai-message'"
                  th:utext="${message.content}">
+            </div>
+        </div>
+
+        <!-- İlk kez chat açıldığında hoş geldin mesajı -->
+        <div th:if="${messages == null || messages.isEmpty()}" class="message ai-message">
+            <div th:if="${currentLang == 'en'}">
+                <h3>Welcome to Psikosys! 👋</h3>
+                <p>I'm your AI assistant with different personalities. You can ask me anything and choose from different conversation styles to get the most suitable answers for your needs.</p>
+                <p><strong>How to start:</strong></p>
+                <ul>
+                    <li>Type your question in the text box below</li>
+                    <li>Choose a personality that suits your needs</li>
+                    <li>Press the send button and start chatting!</li>
+                </ul>
+            </div>
+            <div th:if="${currentLang != 'en'}">
+                <h3>Psikosys'e Hoş Geldiniz! 👋</h3>
+                <p>Ben farklı kişiliklere sahip yapay zeka asistanınızım. Bana istediğiniz her şeyi sorabilir ve ihtiyacınıza en uygun yanıtları almak için farklı sohbet tarzları arasından seçim yapabilirsiniz.</p>
+                <p><strong>Nasıl başlayacaksınız:</strong></p>
+                <ul>
+                    <li>Aşağıdaki metin kutusuna sorunuzu yazın</li>
+                    <li>İhtiyacınıza uygun bir kişilik seçin</li>
+                    <li>Gönder tuşuna basın ve sohbete başlayın!</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -84,7 +120,9 @@
         <div class="chat-input-wrapper">
             <div class="chat-input-group">
                 <textarea name="question" class="chat-input"
-                          th:placeholder="${currentLang == 'en'} ? 'Ask anything...' : 'Herhangi bir şey sor...'" required></textarea>
+                          th:placeholder="${currentLang == 'en'} ? 'Ask anything...' : 'Herhangi bir şey sor...'"
+                          required
+                          onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); this.form.submit();}"></textarea>
                 <button type="submit"><i class="fas fa-paper-plane"></i></button>
             </div>
 
@@ -106,7 +144,9 @@
         <div class="chat-input-wrapper">
             <div class="chat-input-group">
                 <textarea name="question" class="chat-input"
-                          th:placeholder="${currentLang == 'en'} ? 'Ask anything...' : 'Herhangi bir şey sor...'" required></textarea>
+                          th:placeholder="${currentLang == 'en'} ? 'Ask anything...' : 'Herhangi bir şey sor...'"
+                          required
+                          onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); this.form.submit();}"></textarea>
                 <button type="submit"><i class="fas fa-paper-plane"></i></button>
             </div>
 
@@ -123,6 +163,22 @@
             </div>
         </div>
     </form>
+</div>
+
+<!-- Silme onay modalı -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header" th:text="${currentLang == 'en'} ? 'Delete Chat' : 'Sohbeti Sil'">
+            Sohbeti Sil
+        </div>
+        <div class="modal-body" th:text="${currentLang == 'en'} ? 'Are you sure you want to delete this chat? This action cannot be undone.' : 'Bu sohbeti silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.'">
+            Bu sohbeti silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="hideDeleteModal()" th:text="${currentLang == 'en'} ? 'Cancel' : 'İptal'">İptal</button>
+            <button class="btn-delete" onclick="confirmDelete()" th:text="${currentLang == 'en'} ? 'Delete' : 'Sil'">Sil</button>
+        </div>
+    </div>
 </div>
 
 <script th:src="@{/js/chat.js}"></script>

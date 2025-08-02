@@ -6,6 +6,7 @@ import com.atlas.Psikosys.entity.User;
 import com.atlas.Psikosys.repository.ChatRepository;
 import com.atlas.Psikosys.repository.MessageRepository;
 import com.atlas.Psikosys.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -49,6 +50,23 @@ public class ChatService {
 
         // Save chat and return
         return chatRepository.save(chat);
+    }
+
+    @Transactional
+    public void deleteChat(UUID chatId) {
+        User currentUser = getCurrentUser();
+        Chat chat = findChatById(chatId);
+
+        // Güvenlik kontrolü - sadece chat sahibi silebilir
+        if (!chat.getUser().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Bu sohbeti silme yetkiniz yok");
+        }
+
+        chatRepository.deleteById(chatId);
+    }
+
+    public User saveUser(User user) {
+        return userRepository.save(user);
     }
 
     public void saveChat(Chat chat) {

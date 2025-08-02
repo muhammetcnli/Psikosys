@@ -16,7 +16,9 @@
 <div class="home-container">
     <nav class="home-nav">
         <div class="logo">
-            <h1 th:text="${currentLang == 'en'} ? 'Psikosys' : 'Psikosys'">Psikosys</h1>
+            <a href="/" class="sidebar-logo">
+                <h2>Psikosys</h2>
+            </a>
         </div>
         <ul class="nav-links">
             <li><a href="#features" th:text="${currentLang == 'en'} ? 'Features' : 'Özellikler'">Özellikler</a></li>

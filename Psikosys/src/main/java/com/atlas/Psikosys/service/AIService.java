@@ -21,19 +21,16 @@ public class AIService {
         this.htmlService = htmlService;
     }
 
-    /**
-     * Returns HTML-formatted response from AI for a single message with specified personality.
-     */
-    public String getHtmlResponseWithPersonality(String question, String personalityPrompt) throws IOException {
+    public String getHtmlResponseWithPersonality(String question, String personalityPrompt, String language) throws IOException {
         if (personalityPrompt == null || personalityPrompt.trim().isEmpty()) {
             throw new IllegalArgumentException("Personality prompt cannot be null or empty");
         }
 
         System.out.println("=== AI SERVICE DEBUG ===");
         System.out.println("Question: " + question);
+        System.out.println("Language: " + language);
         System.out.println("Original prompt: " + personalityPrompt);
 
-        // {message} placeholder'ını kontrol et
         if (!personalityPrompt.contains("{message}")) {
             System.out.println("UYARI: Prompt'ta {message} placeholder'ı yok!");
             personalityPrompt = personalityPrompt + "\n\nUser message: {message}";
@@ -49,11 +46,13 @@ public class AIService {
         return htmlService.markdownToHtml(response);
     }
 
-    /**
-     * Returns HTML-formatted response from AI based on message history and personality.
-     */
+    // Backward compatibility için
+    public String getHtmlResponseWithPersonality(String question, String personalityPrompt) throws IOException {
+        return getHtmlResponseWithPersonality(question, personalityPrompt, "tr");
+    }
+
     public String getHtmlResponseWithMessageHistoryAndPersonality(List<Message> messages, String newQuestion,
-                                                                  String personalityPrompt, int maxMessages) throws IOException {
+                                                                  String personalityPrompt, int maxMessages, String language) throws IOException {
         if (personalityPrompt == null || personalityPrompt.trim().isEmpty()) {
             throw new IllegalArgumentException("Personality prompt cannot be null or empty");
         }
@@ -78,22 +77,36 @@ public class AIService {
         return htmlService.markdownToHtml(response);
     }
 
-    /**
-     * Generates a short title for a new chat.
-     */
-    public String generateChatTitle(String question) throws IOException {
-        String titlePrompt = """
-        You are a wise Jungian therapist. Create a concise (≤30 characters) chat title \
-        summarizing this message. Only return the title, no extra explanation:
-        \"%s\"""".formatted(question);
-        Prompt prompt = new PromptTemplate(titlePrompt).create(Map.of());
-        String title = callAIAndCleanResponse(prompt.toString());
+    // Backward compatibility için
+    public String getHtmlResponseWithMessageHistoryAndPersonality(List<Message> messages, String newQuestion,
+                                                                  String personalityPrompt, int maxMessages) throws IOException {
+        return getHtmlResponseWithMessageHistoryAndPersonality(messages, newQuestion, personalityPrompt, maxMessages, "tr");
+    }
+
+    public String generateChatTitle(String question, String language) throws IOException {
+        String titlePrompt = getTitlePromptByLanguage(language, question);
+        String title = callAIAndCleanResponse(titlePrompt);
         return title.length() > 30 ? title.substring(0, 30) : title;
     }
 
-    /**
-     * Calls the AI model and cleans the raw response.
-     */
+    // Backward compatibility için
+    public String generateChatTitle(String question) throws IOException {
+        return generateChatTitle(question, "tr");
+    }
+
+    private String getTitlePromptByLanguage(String language, String question) {
+        return switch (language) {
+            case "en" -> String.format("""
+                You are a wise Jungian therapist. Create a concise (≤30 characters) chat title \
+                summarizing this message. Only return the title, no extra explanation:
+                "%s" """, question);
+            default -> String.format("""
+                Sen bilge bir Jungian terapistsin. Bu mesajı özetleyen kısa (≤30 karakter) bir sohbet başlığı oluştur. \
+                Sadece başlığı döndür, ekstra açıklama yapma:
+                "%s" """, question);
+        };
+    }
+
     private String callAIAndCleanResponse(String promptText) {
         return chatClient.prompt()
                 .user(promptText)

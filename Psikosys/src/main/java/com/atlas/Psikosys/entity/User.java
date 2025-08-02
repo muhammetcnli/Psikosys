@@ -65,6 +65,7 @@ public class User {
     private LocalDateTime updatedAt;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = false)
+    @OrderBy("updatedAt DESC") // En yeni önce
     private List<Chat> chats = new ArrayList<>();
 
     @PrePersist

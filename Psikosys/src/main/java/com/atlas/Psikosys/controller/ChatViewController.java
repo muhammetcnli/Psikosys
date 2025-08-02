@@ -14,7 +14,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @Controller
 public class ChatViewController {
@@ -45,7 +47,7 @@ public class ChatViewController {
             }
 
             model.addAttribute("userChats", user.getChats());
-            model.addAttribute("personalities", personalityService.getAllPersonalities());
+            model.addAttribute("personalities", personalityService.getAllPersonalities(currentLanguage));
             model.addAttribute("currentLang", currentLanguage);
             return "chat";
         } catch (Exception e) {
@@ -57,9 +59,12 @@ public class ChatViewController {
     @PostMapping("/chat")
     public String createNewChat(
             @RequestParam("question") String question,
-            @RequestParam(value = "personality", required = false) String personality) {
+            @RequestParam(value = "personality", required = false) String personality,
+            HttpServletRequest request) {
 
         System.out.println("=== YENİ CHAT OLUŞTURULUYOR ===");
+        String currentLanguage = languageService.getCurrentLanguage(request);
+        System.out.println("Mevcut dil: " + currentLanguage);
         System.out.println("Gelen soru: " + question);
         System.out.println("Gelen personality: " + personality);
 
@@ -72,19 +77,32 @@ public class ChatViewController {
         chatService.addMessageToChat(chat.getId(), question, true);
 
         try {
-            String personalityPrompt = personalityService.getPersonalityPrompt(selectedPersonality);
+            String personalityPrompt = personalityService.getPersonalityPrompt(selectedPersonality, currentLanguage);
             System.out.println("Personality prompt: " + personalityPrompt);
 
-            String response = aiService.getHtmlResponseWithPersonality(question, personalityPrompt);
+            String response = aiService.getHtmlResponseWithPersonality(question, personalityPrompt, currentLanguage);
             System.out.println("AI Yanıtı alındı, uzunluk: " + response.length());
 
             chatService.addMessageToChat(chat.getId(), response, false);
         } catch (Exception e) {
             System.out.println("AI Yanıt hatası: " + e.getMessage());
-            chatService.addMessageToChat(chat.getId(), "Cannot get response: " + e.getMessage(), false);
+            String errorMessage = currentLanguage.equals("en") ?
+                    "Cannot get response: " + e.getMessage() :
+                    "Yanıt alınamadı: " + e.getMessage();
+            chatService.addMessageToChat(chat.getId(), errorMessage, false);
         }
 
         return "redirect:/chat/" + chat.getId();
+    }
+
+    @PostMapping("/chat/{id}/delete")
+    public String deleteChat(@PathVariable(value = "id") UUID id, HttpServletRequest request) {
+        try {
+            chatService.deleteChat(id);
+            return "redirect:/chat";
+        } catch (Exception e) {
+            return "redirect:/chat?error=delete_failed";
+        }
     }
 
     @GetMapping("/chat/{id}")
@@ -110,7 +128,7 @@ public class ChatViewController {
             model.addAttribute("chat", chat);
             model.addAttribute("chatId", id);
             model.addAttribute("messages", messages);
-            model.addAttribute("personalities", personalityService.getAllPersonalities());
+            model.addAttribute("personalities", personalityService.getAllPersonalities(currentLanguage));
             model.addAttribute("selectedPersonality", chat.getSelectedPersonality());
             model.addAttribute("currentLang", currentLanguage);
 
@@ -125,8 +143,11 @@ public class ChatViewController {
     public String sendMessage(
             @PathVariable(value = "id") UUID id,
             @RequestParam("question") String question,
-            @RequestParam(value = "personality", required = false) String personality) {
+            @RequestParam(value = "personality", required = false) String personality,
+            HttpServletRequest request) {
         try {
+            String currentLanguage = languageService.getCurrentLanguage(request);
+
             String currentPersonality = personality;
             if (currentPersonality == null || currentPersonality.isEmpty()) {
                 Chat currentChat = chatService.findChatById(id);
@@ -142,17 +163,23 @@ public class ChatViewController {
 
             List<Message> previousMessages = chatService.getMessagesByChatId(id);
 
-            String personalityPrompt = personalityService.getPersonalityPrompt(currentPersonality);
+            String personalityPrompt = personalityService.getPersonalityPrompt(currentPersonality, currentLanguage);
             System.out.println("Selected personality: " + currentPersonality);
+            System.out.println("Language: " + currentLanguage);
             System.out.println("Personality prompt: " + personalityPrompt);
+
             String response = aiService.getHtmlResponseWithMessageHistoryAndPersonality(
-                    previousMessages, question, personalityPrompt, 10);
+                    previousMessages, question, personalityPrompt, 10, currentLanguage);
 
             chatService.addMessageToChat(id, response, false);
 
             return "redirect:/chat/" + id;
         } catch (Exception e) {
-            chatService.addMessageToChat(id, "Yanıt alınamadı: " + e.getMessage(), false);
+            String currentLanguage = languageService.getCurrentLanguage(request);
+            String errorMessage = currentLanguage.equals("en") ?
+                    "Cannot get response: " + e.getMessage() :
+                    "Yanıt alınamadı: " + e.getMessage();
+            chatService.addMessageToChat(id, errorMessage, false);
             return "redirect:/chat/" + id;
         }
     }

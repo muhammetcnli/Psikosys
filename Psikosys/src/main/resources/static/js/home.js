@@ -1,7 +1,13 @@
+// Smooth scroll davranışını etkinleştir
+document.documentElement.style.scrollBehavior = 'smooth';
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Smooth scrolling
-    const links = document.querySelectorAll('a[href^="#"]');
-    links.forEach(link => {
+    // Ana sayfaya scrollable özellik ekle
+    document.body.classList.add('home-body');
+
+    // Smooth scrolling için navigasyon linklerini dinle
+    const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+    navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
             const targetId = this.getAttribute('href').substring(1);
@@ -30,7 +36,18 @@ function scrollToFeatures() {
     }
 }
 
-// Dil değiştirme fonksiyonu - CSRF olmadan
+// About bölümüne scroll
+function scrollToAbout() {
+    const aboutSection = document.getElementById('about');
+    if (aboutSection) {
+        aboutSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+}
+
+// Dil değiştirme fonksiyonu
 function changeLanguageHome(selectedLang) {
     console.log('Dil değiştirme isteği:', selectedLang);
 
@@ -44,7 +61,6 @@ function changeLanguageHome(selectedLang) {
         .then(response => {
             if (response.ok) {
                 console.log('Dil başarıyla değiştirildi:', selectedLang);
-                // Sayfayı yenile
                 window.location.reload();
             } else {
                 console.error('Dil değiştirme başarısız:', response.status);
@@ -57,15 +73,12 @@ function changeLanguageHome(selectedLang) {
 
 // Aktif dil butonunu ayarla
 function setActiveLanguageButton() {
-    // Cookie'den dil bilgisini al
     const userLang = getCookie('user_language') || 'tr';
 
-    // Tüm dil butonlarından active class'ını kaldır
     document.querySelectorAll('.language-btn').forEach(btn => {
         btn.classList.remove('active');
     });
 
-    // İlgili dil butonuna active class'ı ekle
     const activeBtn = document.getElementById(userLang + '-btn');
     if (activeBtn) {
         activeBtn.classList.add('active');

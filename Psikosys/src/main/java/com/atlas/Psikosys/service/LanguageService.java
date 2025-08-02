@@ -4,6 +4,7 @@ import com.atlas.Psikosys.entity.User;
 import com.atlas.Psikosys.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,5 +50,10 @@ public class LanguageService {
             userRepository.save(user);
             System.out.println("Kullanıcı dili güncellendi: " + email + " -> " + language);
         }
+    }
+
+    public void setLanguage(HttpServletRequest request, String language) {
+        HttpSession session = request.getSession();
+        session.setAttribute("language", language);
     }
 }

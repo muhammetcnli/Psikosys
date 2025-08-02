@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
@@ -19,14 +21,24 @@ public class SecurityConfig {
     }
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(registry -> {
-                    registry.requestMatchers("/", "/css/**", "/js/**", "/images/**", "/change-language").permitAll();
+                    registry.requestMatchers("/", "/css/**", "/js/**", "/images/**", "/change-language", "/login", "/register").permitAll();
                     registry.anyRequest().authenticated();
                 })
                 .csrf(csrf ->
-                        csrf.ignoringRequestMatchers("/change-language")
+                        csrf.ignoringRequestMatchers(
+                                "/change-language",
+                                "chat/*/delete",
+                                "/profile/language",
+                                "/profile/password",
+                                "/logout")
                 )
                 // Configure OAuth2 login functionality
                 .oauth2Login(oauth2 ->
@@ -38,7 +50,16 @@ public class SecurityConfig {
                                 userInfo.userService(oAuth2UserService)
                         )
                 )
-                .formLogin(Customizer.withDefaults());
+                .formLogin(Customizer.withDefaults())
+                .logout(logout ->
+                        logout
+                                .logoutUrl("/logout")
+                                .logoutSuccessUrl("/")
+                                .invalidateHttpSession(true)
+                                .clearAuthentication(true)
+                                .deleteCookies("JSESSIONID")
+                                .permitAll()
+                );
 
         return http.build();
     }

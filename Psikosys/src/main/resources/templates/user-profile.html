@@ -1,102 +1,198 @@
 <!DOCTYPE html>
-<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${currentLang != null ? currentLang : 'tr'}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kullanıcı Profili</title>
+    <title th:text="${currentLang == 'en' ? 'Profile – Psikosys' : 'Profil – Psikosys'}">Profil – Psikosys</title>
     <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
-    <link rel="icon" type="image/x-icon" th:href="@{/images/favicon.ico}" />
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-
-        .profile-container {
-            max-width: 600px;
-            margin: 40px auto;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-        }
-
-        .profile-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .profile-image {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 20px;
-            border: 3px solid #3498db;
-        }
-
-        .profile-info {
-            margin-bottom: 15px;
-        }
-
-        .profile-info h1 {
-            margin: 0;
-            color: #333;
-        }
-
-        .profile-info p {
-            margin: 5px 0;
-            color: #666;
-        }
-
-        .profile-details {
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-
-        .detail-item {
-            display: flex;
-            margin-bottom: 10px;
-        }
-
-        .detail-label {
-            font-weight: bold;
-            width: 100px;
-            color: #555;
-        }
-
-        .detail-value {
-            color: #333;
-        }
-    </style>
+    <link rel="icon" type="image/x-icon" th:href="@{/images/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
+<body class="profile-body">
 <div class="profile-container">
-    <div class="profile-header">
-        <img th:if="${photo}" th:src="${photo}" alt="Profil Fotoğrafı" class="profile-image">
-        <div class="profile-info">
-            <h1 th:text="${name}">Kullanıcı Adı</h1>
-            <p th:text="${email}">kullanici@email.com</p>
+    <!-- Header -->
+    <header class="profile-header">
+        <div class="header-content">
+            <a href="/chat" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                <span th:text="${currentLang == 'en' ? 'Back to Chat' : 'Sohbete Dön'}">Sohbete Dön</span>
+            </a>
+            <h1 class="profile-title" th:text="${currentLang == 'en' ? 'Profile Settings' : 'Profil Ayarları'}">Profil Ayarları</h1>
+            <form method="post" action="/logout" class="logout-form">
+                <button type="submit" class="logout-button">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span th:text="${currentLang == 'en' ? 'Logout' : 'Çıkış'}">Çıkış</span>
+                </button>
+            </form>
         </div>
-    </div>
+    </header>
 
-    <div class="profile-details">
-        <div class="detail-item">
-            <div class="detail-label">İsim:</div>
-            <div class="detail-value" th:text="${name}">Kullanıcı Adı</div>
+    <!-- Main Content -->
+    <main class="profile-main">
+        <div class="profile-grid">
+            <!-- Profile Info Card -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <i class="fas fa-user-circle"></i>
+                    <h2 th:text="${currentLang == 'en' ? 'Profile Information' : 'Profil Bilgileri'}">Profil Bilgileri</h2>
+                </div>
+                <div class="profile-info">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar">
+                            <img th:if="${photo != null && !#strings.isEmpty(photo)}"
+                                 th:src="${photo}"
+                                 alt="Profile Photo"
+                                 class="avatar-image"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="avatar-placeholder"
+                                 th:style="${(photo != null && !#strings.isEmpty(photo)) ? 'display:none;' : 'display:flex;'}">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-details">
+                        <div class="detail-item">
+                            <label th:text="${currentLang == 'en' ? 'Name' : 'İsim'}">İsim</label>
+                            <span th:text="${name != null && !#strings.isEmpty(name)} ? ${name} : (${currentLang == 'en'} ? 'Not specified' : 'Belirtilmemiş')">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <label th:text="${currentLang == 'en' ? 'Email' : 'E-posta'}">E-posta</label>
+                            <span th:text="${email != null && !#strings.isEmpty(email)} ? ${email} : (${currentLang == 'en'} ? 'Not specified' : 'Belirtilmemiş')">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <label th:text="${currentLang == 'en' ? 'Account Type' : 'Hesap Türü'}">Hesap Türü</label>
+                            <div class="account-type">
+                                <i th:class="${hasPassword} ? 'fas fa-key' : 'fab fa-google'"></i>
+                                <span th:text="${hasPassword} ? (${currentLang == 'en'} ? 'Local Account' : 'Yerel Hesap') : (${currentLang == 'en'} ? 'Google Account' : 'Google Hesabı')">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Language Settings Card -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <i class="fas fa-language"></i>
+                    <h2 th:text="${currentLang == 'en' ? 'Language Settings' : 'Dil Ayarları'}">Dil Ayarları</h2>
+                </div>
+                <form id="languageForm" th:action="@{/profile/language}" method="post" class="settings-form">
+                    <div class="form-group">
+                        <label for="languageSelect" th:text="${currentLang == 'en' ? 'Preferred Language' : 'Tercih Edilen Dil'}">Tercih Edilen Dil</label>
+                        <div class="select-wrapper">
+                            <select id="languageSelect" name="language" class="form-select">
+                                <option value="tr" th:selected="${currentLang == 'tr'}">🇹🇷 Türkçe</option>
+                                <option value="en" th:selected="${currentLang == 'en'}">🇬🇧 English</option>
+                            </select>
+                            <i class="fas fa-chevron-down select-icon"></i>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        <span th:text="${currentLang == 'en' ? 'Save Language' : 'Dili Kaydet'}">Dili Kaydet</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Password Settings Card -->
+            <div th:if="${hasPassword or showPasswordForm}" class="settings-card password-card">
+                <div class="card-header">
+                    <i class="fas fa-lock"></i>
+                    <h2 th:text="${hasPassword ? (currentLang == 'en' ? 'Change Password' : 'Şifre Değiştir') : (currentLang == 'en' ? 'Set Password' : 'Şifre Belirle')}">Şifre Ayarları</h2>
+                </div>
+                <div th:if="not ${hasPassword}" class="card-description">
+                    <p th:text="${currentLang == 'en' ? 'Set a password to secure your account and enable local login' : 'Hesabınızı güvence altına almak ve yerel giriş yapmak için şifre belirleyin'}"></p>
+                </div>
+                <form id="passwordForm" th:action="@{/profile/password}" method="post" class="settings-form">
+                    <div th:if="${hasPassword}" class="form-group">
+                        <label for="currentPassword" th:text="${currentLang == 'en' ? 'Current Password' : 'Mevcut Şifre'}">Mevcut Şifre</label>
+                        <div class="input-wrapper">
+                            <input type="password"
+                                   id="currentPassword"
+                                   name="currentPassword"
+                                   class="form-input"
+                                   required
+                                   autocomplete="current-password"
+                                   th:placeholder="${currentLang == 'en' ? 'Enter current password' : 'Mevcut şifrenizi girin'}">
+                            <i class="fas fa-eye-slash toggle-password"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword" th:text="${hasPassword} ? (${currentLang == 'en'} ? 'New Password' : 'Yeni Şifre') : (${currentLang == 'en'} ? 'Password' : 'Şifre')">Yeni Şifre</label>
+                        <div class="input-wrapper">
+                            <input type="password"
+                                   id="newPassword"
+                                   name="newPassword"
+                                   class="form-input"
+                                   required
+                                   minlength="6"
+                                   autocomplete="new-password"
+                                   th:placeholder="${currentLang == 'en' ? 'Enter new password (min 6 characters)' : 'Yeni şifrenizi girin (en az 6 karakter)'}">
+                            <i class="fas fa-eye-slash toggle-password"></i>
+                        </div>
+                        <div class="password-strength">
+                            <div class="strength-bar">
+                                <div class="strength-fill"></div>
+                            </div>
+                            <span class="strength-text" th:text="${currentLang == 'en' ? 'Password strength will be shown here' : 'Şifre gücü burada gösterilecek'}">Şifre gücü burada gösterilecek</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword" th:text="${currentLang == 'en' ? 'Confirm Password' : 'Şifre Tekrar'}">Şifre Tekrar</label>
+                        <div class="input-wrapper">
+                            <input type="password"
+                                   id="confirmPassword"
+                                   name="confirmPassword"
+                                   class="form-input"
+                                   required
+                                   autocomplete="new-password"
+                                   th:placeholder="${currentLang == 'en' ? 'Confirm your password' : 'Şifrenizi tekrar girin'}">
+                            <i class="fas fa-eye-slash toggle-password"></i>
+                        </div>
+                        <div class="password-match-indicator">
+                            <i class="fas fa-check"></i>
+                            <span th:text="${currentLang == 'en' ? 'Passwords match' : 'Şifreler eşleşiyor'}">Şifreler eşleşiyor</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-key"></i>
+                        <span th:text="${hasPassword} ? (${currentLang == 'en'} ? 'Change Password' : 'Şifreyi Değiştir') : (${currentLang == 'en'} ? 'Set Password' : 'Şifreyi Belirle')">Şifreyi Kaydet</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Google hesap için şifre belirleme -->
+            <div th:if="${not hasPassword and not showPasswordForm}" class="settings-card">
+                <div class="card-header">
+                    <i class="fas fa-shield-alt"></i>
+                    <h2 th:text="${currentLang == 'en' ? 'Security Settings' : 'Güvenlik Ayarları'}">Güvenlik Ayarları</h2>
+                </div>
+                <div class="card-description">
+                    <p th:text="${currentLang == 'en' ? 'Your account is secured with Google. You can optionally set a password for local login.' : 'Hesabınız Google ile güvence altında. İsteğe bağlı olarak yerel giriş için şifre belirleyebilirsiniz.'}"></p>
+                </div>
+                <a href="/profile?showPasswordForm=true" class="btn btn-secondary">
+                    <i class="fas fa-plus"></i>
+                    <span th:text="${currentLang == 'en' ? 'Set Password' : 'Şifre Belirle'}">Şifre Belirle</span>
+                </a>
+            </div>
         </div>
-        <div class="detail-item">
-            <div class="detail-label">E-posta:</div>
-            <div class="detail-value" th:text="${email}">kullanici@email.com</div>
+
+        <!-- Mesajlar -->
+        <div th:if="${success} or ${error}" class="messages-container">
+            <div th:if="${success}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}"></span>
+            </div>
+            <div th:if="${error}" class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${error}"></span>
+            </div>
         </div>
-        <div class="detail-item">
-            <div class="detail-label">Hesap:</div>
-            <div class="detail-value">Google</div>
-        </div>
-    </div>
+    </main>
 </div>
+<script th:src="@{/js/profile.js}"></script>
 </body>
 </html>

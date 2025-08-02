@@ -15,7 +15,7 @@ public class PersonalityController {
     private PersonalityService personalityService;
 
     @GetMapping
-    public Map<String, Map<String, Object>> getAllPersonalities() {
+    public Map<String, PersonalityService.PersonalityData> getAllPersonalities() {
         return personalityService.getAllPersonalities();
     }
 }
