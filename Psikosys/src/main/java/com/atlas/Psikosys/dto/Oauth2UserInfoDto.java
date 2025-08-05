@@ -17,9 +17,7 @@ public class Oauth2UserInfoDto {
 
     private UUID id;
 
-    private String firstName;
-
-    private String lastName;
+    private String name;
 
     private String email;
 

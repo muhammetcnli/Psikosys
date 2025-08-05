@@ -41,7 +41,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             // Yeni kullanıcı oluştur - cookie'deki dili kullan
             user = User.builder()
                     .email(email)
-                    .firstName(name) // User entity'sinde firstName var
+                    .name(name)
                     .picture(picture)
                     .preferredLanguage(preferredLanguage) // Doğru field adı
                     .createdAt(LocalDateTime.now())
@@ -54,8 +54,8 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             // Mevcut kullanıcı - sadece profil bilgilerini güncelle, dili KORUR
             boolean updated = false;
 
-            if (name != null && !name.equals(user.getFirstName())) {
-                user.setFirstName(name);
+            if (name != null && !name.equals(user.getName())) {
+                user.setName(name);
                 updated = true;
             }
 

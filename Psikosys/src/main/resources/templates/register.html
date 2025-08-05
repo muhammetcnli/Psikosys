@@ -1,10 +1,313 @@
 <!DOCTYPE html>
-<html lang="en">
+<html th:lang="${currentLang != null ? currentLang : 'tr'}" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${currentLang == 'en'} ? 'Sign Up - Psikosys' : 'Kayıt Ol - Psikosys'">Kayıt Ol - Psikosys</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f5f7fa;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .error-message, .success-message {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .error-message {
+      background-color: #fee;
+      color: #c33;
+      border: 1px solid #fcc;
+    }
+
+    .success-message {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .error-message i, .success-message i {
+      font-size: 16px;
+    }
+
+    .header .app-name-link {
+      text-decoration: none;
+      color: inherit;
+      display: inline-block;
+    }
+
+    .header .app-name-link:hover .app-name {
+      color: #3a5a8a;
+    }
+
+    .header {
+      padding: 20px 40px;
+      background-color: #fff;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .app-name {
+      font-size: 24px;
+      font-weight: 600;
+      color: #4a6fa5;
+    }
+
+    .register-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .register-box {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .register-title {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 16px 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 50px;
+      font-size: 16px;
+      background: #fff;
+      transition: all 0.2s;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: #4a6fa5;
+      box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+    }
+
+    .form-input::placeholder {
+      color: #999;
+    }
+
+    .register-btn {
+      width: 100%;
+      padding: 16px 20px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin-bottom: 20px;
+    }
+
+    .register-btn:hover {
+      background-color: #1a1a1a;
+    }
+
+    .login-link {
+      text-align: center;
+      margin: 20px 0;
+      color: #666;
+    }
+
+    .login-link a {
+      color: #4a6fa5;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+
+    .divider {
+      text-align: center;
+      margin: 30px 0;
+      position: relative;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #e0e0e0;
+    }
+
+    .divider span {
+      background: #fff;
+      padding: 0 20px;
+    }
+
+    .google-btn {
+      width: 100%;
+      padding: 16px 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 50px;
+      background: #fff;
+      color: #333;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .google-btn:hover {
+      border-color: #4a6fa5;
+      background-color: #f8f9fa;
+    }
+
+    .google-icon {
+      width: 20px;
+      height: 20px;
+      background-image: url("data:image/svg+xml,%3csvg width='18' height='18' xmlns='http://www.w3.org/2000/svg'%3e%3cg fill='none' fill-rule='evenodd'%3e%3cpath d='M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.584h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.688-3.875 2.688-6.718z' fill='%234285F4'/%3e%3cpath d='M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259a5.78 5.78 0 01-8.619-3.04H.584v2.33A8.998 8.998 0 009 18z' fill='%2334A853'/%3e%3cpath d='M3.429 10.521a5.41 5.41 0 010-3.042V4.149H.584a8.998 8.998 0 000 8.702l2.845-2.33z' fill='%23FBBC04'/%3e%3cpath d='M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.584 4.149L3.43 6.479A5.361 5.361 0 019 3.58z' fill='%23EA4335'/%3e%3c/g%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 15px 20px;
+      }
+
+      .register-box {
+        padding: 30px 20px;
+        margin: 0 10px;
+      }
+
+      .register-title {
+        font-size: 24px;
+      }
+    }
+  </style>
 </head>
 <body>
 
+<div class="header">
+  <a href="/" class="app-name-link">
+    <div class="app-name">Psikosys</div>
+  </a>
+</div>
+
+<div class="register-container">
+  <div class="register-box">
+    <h1 class="register-title" th:text="${currentLang == 'en'} ? 'Create Account' : 'Hesap Oluştur'">
+      Hesap Oluştur
+    </h1>
+
+    <!-- Hata ve başarı mesajları -->
+    <div th:if="${errorMessage}" class="error-message">
+      <i class="fas fa-exclamation-circle"></i>
+      <span th:text="${errorMessage}"></span>
+    </div>
+
+    <div th:if="${successMessage}" class="success-message">
+      <i class="fas fa-check-circle"></i>
+      <span th:text="${successMessage}"></span>
+    </div>
+
+    <form th:action="@{/register}" method="post">
+      <div class="form-group">
+        <input type="email"
+               class="form-input"
+               name="email"
+               th:value="${email}"
+               th:placeholder="${currentLang == 'en'} ? 'Email address' : 'E-posta adresi'"
+               required>
+      </div>
+
+      <div class="form-group">
+        <input type="text"
+               class="form-input"
+               name="fullName"
+               th:value="${fullName}"
+               th:placeholder="${currentLang == 'en'} ? 'Full Name' : 'Ad Soyad'"
+               required>
+      </div>
+
+      <div class="form-group">
+        <input type="password"
+               class="form-input"
+               name="password"
+               th:placeholder="${currentLang == 'en'} ? 'Password' : 'Şifre'"
+               required>
+      </div>
+
+      <div class="form-group">
+        <input type="password"
+               class="form-input"
+               name="confirmPassword"
+               th:placeholder="${currentLang == 'en'} ? 'Confirm Password' : 'Şifre Tekrarı'"
+               required>
+      </div>
+
+      <button type="submit" class="register-btn" th:text="${currentLang == 'en'} ? 'Create Account' : 'Hesap Oluştur'">
+        Hesap Oluştur
+      </button>
+    </form>
+
+    <div class="login-link">
+            <span th:text="${currentLang == 'en'} ? 'Already have an account?' : 'Zaten hesabın var mı?'">
+                Zaten hesabın var mı?
+            </span>
+      <a href="/login" th:text="${currentLang == 'en'} ? 'Sign in' : 'Giriş yap'">Giriş yap</a>
+    </div>
+
+    <div class="divider">
+      <span th:text="${currentLang == 'en'} ? 'OR' : 'YA DA'">YA DA</span>
+    </div>
+
+    <a href="/oauth2/authorization/google" class="google-btn">
+      <div class="google-icon"></div>
+      <span th:text="${currentLang == 'en'} ? 'Continue with Google' : 'Google ile devam et'">
+                Google ile devam et
+            </span>
+    </a>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 </body>
 </html>

@@ -1,9 +1,12 @@
 package com.atlas.Psikosys.configuration;
 
+import com.atlas.Psikosys.service.CustomUserDetailsService;
 import com.atlas.Psikosys.service.OAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,9 +18,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 public class SecurityConfig {
 
     private final OAuth2UserService oAuth2UserService;
+    private final CustomUserDetailsService userDetailsService;
 
-    public SecurityConfig(OAuth2UserService oAuth2UserService) {
+    public SecurityConfig(OAuth2UserService oAuth2UserService, CustomUserDetailsService userDetailsService) {
         this.oAuth2UserService = oAuth2UserService;
+        this.userDetailsService = userDetailsService;
     }
 
     @Bean
@@ -26,8 +31,22 @@ public class SecurityConfig {
     }
 
     @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .authenticationProvider(authenticationProvider()) // Bu satır eklendi
                 .authorizeHttpRequests(registry -> {
                     registry.requestMatchers("/", "/css/**", "/js/**", "/images/**", "/change-language", "/login", "/register").permitAll();
                     registry.anyRequest().authenticated();
@@ -38,19 +57,24 @@ public class SecurityConfig {
                                 "chat/*/delete",
                                 "/profile/language",
                                 "/profile/password",
-                                "/logout")
+                                "/logout",
+                                "/register")
                 )
-                // Configure OAuth2 login functionality
                 .oauth2Login(oauth2 ->
-                        // Customize the userInfo endpoint processing
                         oauth2.userInfoEndpoint(userInfo ->
-                                // Set our custom OAuth2UserService to handle user information
-                                // This service processes user data from the OAuth provider like Google
-                                // and maps it to our application's user model
-                                userInfo.userService(oAuth2UserService)
-                        )
+                                        userInfo.userService(oAuth2UserService)
+                                )
+                                .loginPage("/login")
+                                .defaultSuccessUrl("/chat", true)
                 )
-                .formLogin(Customizer.withDefaults())
+                .formLogin(form ->
+                        form.loginPage("/login")
+                                .defaultSuccessUrl("/chat", true)
+                                .failureUrl("/login?error=true")
+                                .usernameParameter("username")
+                                .passwordParameter("password")
+                                .permitAll()
+                )
                 .logout(logout ->
                         logout
                                 .logoutUrl("/logout")

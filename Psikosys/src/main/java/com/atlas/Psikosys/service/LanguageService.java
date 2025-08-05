@@ -7,6 +7,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service
 public class LanguageService {
@@ -41,6 +46,17 @@ public class LanguageService {
 
         System.out.println("Varsayılan dil: tr");
         return "tr"; // Varsayılan
+    }
+
+    public void setLanguageCookie(HttpServletRequest request, String language) {
+        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
+        if (response != null) {
+            Cookie cookie = new Cookie("user_language", language);
+            cookie.setMaxAge(365 * 24 * 60 * 60); // 1 yıl
+            cookie.setPath("/");
+            cookie.setHttpOnly(false); // JavaScript'ten erişilebilir olması için
+            response.addCookie(cookie);
+        }
     }
 
     public void updateUserLanguage(String email, String language) {

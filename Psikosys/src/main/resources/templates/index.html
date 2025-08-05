@@ -23,7 +23,7 @@
         <ul class="nav-links">
             <li><a href="#features" th:text="${currentLang == 'en'} ? 'Features' : 'Özellikler'">Özellikler</a></li>
             <li><a href="#about" th:text="${currentLang == 'en'} ? 'About' : 'Hakkında'">Hakkında</a></li>
-            <li><a href="/chat" class="nav-button" th:text="${currentLang == 'en'} ? 'Start Chat' : 'Sohbete Başla'">Sohbete Başla</a></li>
+            <li><a href="/chat" class="nav-button" th:text="${currentLang == 'en'} ? 'Start Session' : 'Seansa Başla'">Seansa Başla</a></li>
             <li class="language-switcher">
                 <button onclick="changeLanguageHome('tr')"
                         class="language-btn"
@@ -39,49 +39,80 @@
 
     <section class="hero">
         <div class="hero-content">
-            <h1 th:text="${currentLang == 'en'} ? 'AI-Powered Chat with Psikosys' : 'Psikosys ile Yapay Zeka Destekli Sohbet'">Psikosys ile Yapay Zeka Destekli Sohbet</h1>
-            <p th:text="${currentLang == 'en'} ? 'AI assistant that will be with you with a personalized chat experience' : 'Kişiselleştirilmiş sohbet deneyimi ile yanınızda olacak yapay zeka asistanı'">Kişiselleştirilmiş sohbet deneyimi ile yanınızda olacak yapay zeka asistanı</p>
+            <h1 th:text="${currentLang == 'en'} ? 'AI-Powered Psychological Analysis' : 'Yapay Zeka Destekli Psikolojik Analiz'">Yapay Zeka Destekli Psikolojik Analiz</h1>
+            <p th:text="${currentLang == 'en'} ? 'Professional psychological support and analysis with advanced AI technology. Start your journey to emotional well-being.' : 'Gelişmiş yapay zeka teknolojisi ile profesyonel psikolojik destek ve analiz. Duygusal sağlığınıza giden yolculuğa başlayın.'">Gelişmiş yapay zeka teknolojisi ile profesyonel psikolojik destek ve analiz. Duygusal sağlığınıza giden yolculuğa başlayın.</p>
             <div class="hero-buttons">
-                <button class="primary-button" onclick="window.location.href='/chat'" th:text="${currentLang == 'en'} ? 'Get Started' : 'Hemen Başla'">Hemen Başla</button>
+                <button class="primary-button" onclick="window.location.href='/chat'" th:text="${currentLang == 'en'} ? 'Start Session' : 'Seans Başlat'">Seans Başlat</button>
                 <button class="secondary-button" onclick="scrollToFeatures()" th:text="${currentLang == 'en'} ? 'Learn More' : 'Daha Fazla Bilgi'">Daha Fazla Bilgi</button>
             </div>
         </div>
     </section>
 
     <section id="features" class="features">
-        <h2 th:text="${currentLang == 'en'} ? 'Our Features' : 'Özelliklerimiz'">Özelliklerimiz</h2>
+        <h2 th:text="${currentLang == 'en'} ? 'Psychological Support Features' : 'Psikolojik Destek Özellikleri'">Psikolojik Destek Özellikleri</h2>
         <div class="features-grid">
             <div class="feature-card">
-                <i class="fas fa-comment-dots feature-icon"></i>
-                <h3 th:text="${currentLang == 'en'} ? 'Smart Chat' : 'Akıllı Sohbet'">Akıllı Sohbet</h3>
-                <p th:text="${currentLang == 'en'} ? 'Can have meaningful conversations with you with natural language understanding capabilities.' : 'Doğal dil anlama yetenekleri ile sizinle anlamlı konuşmalar yapabilir.'">Doğal dil anlama yetenekleri ile sizinle anlamlı konuşmalar yapabilir.</p>
-            </div>
-            <div class="feature-card">
                 <i class="fas fa-brain feature-icon"></i>
-                <h3 th:text="${currentLang == 'en'} ? 'Different Personalities' : 'Farklı Kişilikler'">Farklı Kişilikler</h3>
-                <p th:text="${currentLang == 'en'} ? 'You can switch between different chat personalities according to your needs.' : 'İhtiyacınıza göre farklı sohbet kişilikleri arasında geçiş yapabilirsiniz.'">İhtiyacınıza göre farklı sohbet kişilikleri arasında geçiş yapabilirsiniz.</p>
+                <h3 th:text="${currentLang == 'en'} ? 'Deep Psychological Analysis' : 'Derin Psikolojik Analiz'">Derin Psikolojik Analiz</h3>
+                <p th:text="${currentLang == 'en'} ? 'Advanced AI algorithms analyze your thoughts and emotions to provide personalized psychological insights.' : 'Gelişmiş AI algoritmaları düşüncelerinizi ve duygularınızı analiz ederek kişiselleştirilmiş psikolojik içgörüler sunar.'">Gelişmiş AI algoritmaları düşüncelerinizi ve duygularınızı analiz ederek kişiselleştirilmiş psikolojik içgörüler sunar.</p>
             </div>
             <div class="feature-card">
-                <i class="fas fa-lock feature-icon"></i>
-                <h3 th:text="${currentLang == 'en'} ? 'Secure Communication' : 'Güvenli İletişim'">Güvenli İletişim</h3>
-                <p th:text="${currentLang == 'en'} ? 'All your conversations are safely stored and protected.' : 'Tüm sohbetleriniz güvenle saklanır ve korunur.'">Tüm sohbetleriniz güvenle saklanır ve korunur.</p>
+                <i class="fas fa-user-md feature-icon"></i>
+                <h3 th:text="${currentLang == 'en'} ? 'Jungian & Freudian Approaches' : 'Jung ve Freud Yaklaşımları'">Jung ve Freud Yaklaşımları</h3>
+                <p th:text="${currentLang == 'en'} ? 'Deep psychological analysis using Jungian archetypes and Freudian psychoanalytic principles.' : 'Jung arketipleri ve Freud psikanalitik prensipleri kullanarak derin psikolojik analiz.'">Jung arketipleri ve Freud psikanalitik prensipleri kullanarak derin psikolojik analiz.</p>
             </div>
             <div class="feature-card">
-                <i class="fas fa-history feature-icon"></i>
-                <h3 th:text="${currentLang == 'en'} ? 'Chat History' : 'Sohbet Geçmişi'">Sohbet Geçmişi</h3>
-                <p th:text="${currentLang == 'en'} ? 'You can easily access your previous conversations.' : 'Önceki konuşmalarınıza kolayca erişebilirsiniz.'">Önceki konuşmalarınıza kolayca erişebilirsiniz.</p>
+                <i class="fas fa-shield-alt feature-icon"></i>
+                <h3 th:text="${currentLang == 'en'} ? 'Complete Confidentiality' : 'Tam Gizlilik'">Tam Gizlilik</h3>
+                <p th:text="${currentLang == 'en'} ? 'All your personal information and sessions are completely secure and confidential.' : 'Tüm kişisel bilgileriniz ve seanslarınız tamamen güvenli ve gizlidir.'">Tüm kişisel bilgileriniz ve seanslarınız tamamen güvenli ve gizlidir.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-chart-line feature-icon"></i>
+                <h3 th:text="${currentLang == 'en'} ? 'Progress Tracking' : 'İlerleme Takibi'">İlerleme Takibi</h3>
+                <p th:text="${currentLang == 'en'} ? 'Monitor your emotional development and psychological progress over time.' : 'Zamanla duygusal gelişiminizi ve psikolojik ilerlemenizi takip edin.'">Zamanla duygusal gelişiminizi ve psikolojik ilerlemenizi takip edin.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-clock feature-icon"></i>
+                <h3 th:text="${currentLang == 'en'} ? '24/7 Availability' : '7/24 Erişilebilirlik'">7/24 Erişilebilirlik</h3>
+                <p th:text="${currentLang == 'en'} ? 'Get psychological support whenever you need it, day or night.' : 'Gece gündüz, ihtiyacınız olduğunda psikolojik destek alın.'">Gece gündüz, ihtiyacınız olduğunda psikolojik destek alın.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-heart feature-icon"></i>
+                <h3 th:text="${currentLang == 'en'} ? 'Emotional Intelligence' : 'Duygusal Zeka'">Duygusal Zeka</h3>
+                <p th:text="${currentLang == 'en'} ? 'AI that understands your emotional state and responds empathetically.' : 'Duygusal durumunuzu anlayan ve empatik şekilde yanıt veren yapay zeka.'">Duygusal durumunuzu anlayan ve empatik şekilde yanıt veren yapay zeka.</p>
             </div>
         </div>
     </section>
 
     <section id="about" class="about-section">
         <h2 th:text="${currentLang == 'en'} ? 'About Psikosys' : 'Psikosys Hakkında'">Psikosys Hakkında</h2>
-        <p th:text="${currentLang == 'en'} ? 'Psikosys is an AI-powered platform designed to provide users with a personalized chat experience. Our assistant, which can be adapted to different needs, has been developed to always be by your side.' : 'Psikosys, kullanıcılarına kişiselleştirilmiş bir sohbet deneyimi sunmak için tasarlanmış yapay zeka destekli bir platformdur. Farklı ihtiyaçlara göre uyarlanabilen asistanımız, her zaman yanınızda olmak için geliştirilmiştir.'">Psikosys, kullanıcılarına kişiselleştirilmiş bir sohbet deneyimi sunmak için tasarlanmış yapay zeka destekli bir platformdur. Farklı ihtiyaçlara göre uyarlanabilen asistanımız, her zaman yanınızda olmak için geliştirilmiştir.</p>
+        <p th:text="${currentLang == 'en'} ? 'Psikosys is an innovative AI-powered psychological support platform that combines cutting-edge artificial intelligence with established psychological theories and therapeutic approaches. Our system is designed to provide accessible, confidential, and effective psychological support to individuals seeking mental health assistance.' : 'Psikosys, son teknoloji yapay zekayı yerleşik psikolojik teoriler ve terapötik yaklaşımlarla birleştiren yenilikçi bir AI destekli psikolojik destek platformudur. Sistemimiz, ruh sağlığı yardımı arayan bireylere erişilebilir, gizli ve etkili psikolojik destek sağlamak için tasarlanmıştır.'">Psikosys, son teknoloji yapay zekayı yerleşik psikolojik teoriler ve terapötik yaklaşımlarla birleştiren yenilikçi bir AI destekli psikolojik destek platformudur. Sistemimiz, ruh sağlığı yardımı arayan bireylere erişilebilir, gizli ve etkili psikolojik destek sağlamak için tasarlanmıştır.</p>
+
+        <div class="about-features">
+            <div class="about-feature">
+                <i class="fas fa-microscope"></i>
+                <h3 th:text="${currentLang == 'en'} ? 'Evidence-Based Approach' : 'Kanıta Dayalı Yaklaşım'">Kanıta Dayalı Yaklaşım</h3>
+                <p th:text="${currentLang == 'en'} ? 'Our AI models are trained on scientifically proven psychological methods and research.' : 'AI modellerimiz bilimsel olarak kanıtlanmış psikolojik yöntemler ve araştırmalar üzerinde eğitilmiştir.'">AI modellerimiz bilimsel olarak kanıtlanmış psikolojik yöntemler ve araştırmalar üzerinde eğitilmiştir.</p>
+            </div>
+            <div class="about-feature">
+                <i class="fas fa-user-friends"></i>
+                <h3 th:text="${currentLang == 'en'} ? 'Personalized Experience' : 'Kişiselleştirilmiş Deneyim'">Kişiselleştirilmiş Deneyim</h3>
+                <p th:text="${currentLang == 'en'} ? 'Each session is tailored to your unique psychological profile and current emotional state.' : 'Her seans, benzersiz psikolojik profilinize ve mevcut duygusal durumunuza göre uyarlanır.'">Her seans, benzersiz psikolojik profilinize ve mevcut duygusal durumunuza göre uyarlanır.</p>
+            </div>
+            <div class="about-feature">
+                <i class="fas fa-graduation-cap"></i>
+                <h3 th:text="${currentLang == 'en'} ? 'Continuous Learning' : 'Sürekli Öğrenme'">Sürekli Öğrenme</h3>
+                <p th:text="${currentLang == 'en'} ? 'Our AI continuously improves by learning from interactions while maintaining privacy.' : 'Yapay zekamız gizliliği korurken etkileşimlerden öğrenerek sürekli gelişir.'">Yapay zekamız gizliliği korurken etkileşimlerden öğrenerek sürekli gelişir.</p>
+            </div>
+        </div>
     </section>
 
     <footer class="home-footer">
         <div class="footer-content">
             <p>&copy; 2025 Psikosys. <span th:text="${currentLang == 'en'} ? 'All rights reserved.' : 'Tüm hakları saklıdır.'">Tüm hakları saklıdır.</span></p>
+            <div class="footer-note">
+                <p th:text="${currentLang == 'en'} ? 'Note: Psikosys is an AI-powered psychological support tool and does not replace professional therapy or medical treatment.' : 'Not: Psikosys yapay zeka destekli bir psikolojik destek aracıdır ve profesyonel terapi veya tıbbi tedavinin yerini almaz.'">Not: Psikosys yapay zeka destekli bir psikolojik destek aracıdır ve profesyonel terapi veya tıbbi tedavinin yerini almaz.</p>
+            </div>
             <div class="social-links">
                 <a href="https://github.com/muhammetcnli/Psikosys" target="_blank"><i class="fab fa-github"></i></a>
             </div>

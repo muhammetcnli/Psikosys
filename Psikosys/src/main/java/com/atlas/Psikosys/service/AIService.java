@@ -97,11 +97,11 @@ public class AIService {
     private String getTitlePromptByLanguage(String language, String question) {
         return switch (language) {
             case "en" -> String.format("""
-                You are a wise Jungian therapist. Create a concise (≤30 characters) chat title \
+                You are a wise psychologist therapist. Create a concise (≤30 characters) chat title \
                 summarizing this message. Only return the title, no extra explanation:
                 "%s" """, question);
             default -> String.format("""
-                Sen bilge bir Jungian terapistsin. Bu mesajı özetleyen kısa (≤30 karakter) bir sohbet başlığı oluştur. \
+                Sen bilge bir psikologsun. Bu mesajı özetleyen kısa (≤30 karakter) bir sohbet başlığı oluştur. \
                 Sadece başlığı döndür, ekstra açıklama yapma:
                 "%s" """, question);
         };
