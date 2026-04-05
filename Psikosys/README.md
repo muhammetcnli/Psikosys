@@ -1,59 +1,52 @@
 # Psikosys
 
-[![Java](https://img.shields.io/badge/Java-21-blue)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.3-6DB33F)](https://spring.io/projects/spring-boot)
-[![Maven](https://img.shields.io/badge/Build-Maven-C71A36)](https://maven.apache.org/)
-[![MySQL](https://img.shields.io/badge/Database-MySQL-4479A1)](https://www.mysql.com/)
+Psikosys is a Spring Boot web application that combines AI chat, Jungian-style personality prompts, and user account management (form login + Google OAuth2).
 
-Psikosys is an AI-assisted psychological chat platform built with Spring Boot. It combines personality-based prompt strategies, bilingual UX (`tr` / `en`), and secure authentication with both form login and Google OAuth2.
+## Features
 
-## Key Features
-
-- Personality-driven AI chat with configurable prompt files
-- Multi-language experience with cookie-based and profile-based language preferences
-- User registration and login with Spring Security
-- Google OAuth2 sign-in support
-- Profile management (language + password update)
-- REST API endpoints for AI and personality data
+- AI-supported chat flow with personality-based prompt selection
+- Multi-language support (`tr` / `en`) with cookie + user preference sync
+- User registration, login, profile management, and password update
+- Google OAuth2 login integration
+- Thymeleaf-based UI pages (`index`, `login`, `register`, `chat`, `user-profile`)
+- REST endpoints for AI generation and personality listing
 
 ## Tech Stack
 
-- `Java 21`
-- `Spring Boot 3.4.3`
-- `Spring Web`, `Spring Security`, `Spring Data JPA`, `Thymeleaf`
-- `Spring AI` (OpenAI-compatible endpoint)
-- `MySQL`
-- `Maven`
+- Java 21
+- Spring Boot 3.4.3
+- Spring Web, Spring Security, Spring Data JPA, Thymeleaf
+- Spring AI (OpenAI-compatible API via Groq)
+- MySQL
+- Maven
 
-## Pages and Their Purpose
-
-- `GET /` (`index.html`): Landing page, introduction, and language selection entry point
-- `GET /login` (`login.html`): Form login and Google OAuth2 login access
-- `GET /register` (`register.html`): New account creation flow
-- `GET /chat` (`chat.html`): Main chat workspace, personality selection, chat list
-- `GET /chat/{id}` (`chat.html`): Existing conversation detail with message history
-- `GET /profile` (`user-profile.html`): Account profile, language preference, password management
-
-## Getting Started
-
-### 1) Prerequisites
+## Prerequisites
 
 - JDK 21
 - MySQL 8+
 - Maven (or Maven Wrapper)
 
-### 2) Database Setup
+## Setup
 
-- Create a MySQL database named `psikosys`.
-- Ensure your database credentials in `src/main/resources/application.properties` match your local MySQL user.
-- Default values in this project are currently:
-  - `spring.datasource.url=jdbc:mysql://localhost:3306/psikosys`
-  - `spring.datasource.username=springstudent`
-  - `spring.datasource.password=springstudent`
+### 1) Database setup
 
-### 3) Environment Variables (`.env`)
+Run these SQL commands in MySQL:
 
-Create a `.env` file in the project root (same level as `pom.xml`):
+```sql
+CREATE DATABASE IF NOT EXISTS psikosys
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+CREATE USER IF NOT EXISTS 'springstudent'@'localhost'
+IDENTIFIED BY 'springstudent';
+
+GRANT ALL PRIVILEGES ON psikosys.* TO 'springstudent'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+### 2) Environment variables (`.env`)
+
+Create a `.env` file in project root (same level as `pom.xml`):
 
 ```dotenv
 SPRING_AI_OPENAI_API_KEY=your_api_key_here
@@ -65,51 +58,63 @@ GOOGLE_AUTH_CLIENT_SECRET=your_google_client_secret
 GOOGLE_AUTH_CLIENT_URI=http://localhost:8080/login/oauth2/code/google
 ```
 
-`application.properties` imports `.env` via `spring.config.import=optional:file:.env`.
+> `application.properties` already imports `.env` via `spring.config.import=optional:file:.env`.
 
-### 4) Run the Application
+### 3) Run the application
 
-Windows (PowerShell):
+#### Windows (PowerShell)
 
 ```powershell
 .\mvnw.cmd spring-boot:run
 ```
 
-macOS/Linux:
+#### macOS/Linux
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-Application URL: `http://localhost:8080`
+App URL:
 
-## Running Tests
+- `http://localhost:8080`
 
-Windows (PowerShell):
+## Run Tests
+
+### Windows (PowerShell)
 
 ```powershell
 .\mvnw.cmd test
 ```
 
-macOS/Linux:
+### macOS/Linux
 
 ```bash
 ./mvnw test
 ```
 
-## API Overview
+## Important Routes
 
-- `GET /api/ai/generate?message=...` - single AI response
-- `GET /api/ai/generateStream?message=...` - streaming AI response
-- `GET /api/personalities` - available personality definitions
-- `GET /api/debug/token` - OAuth token debug information
+### UI routes
 
-## Screenshots
+- `GET /` -> landing page
+- `GET /login` -> login page
+- `GET /register` -> register page
+- `GET /chat` -> chat page
+- `GET /profile` -> user profile
 
-Place your screenshots under `src/main/resources/static/images/` with the following file names:
+### API routes
+
+- `GET /api/ai/generate?message=...`
+- `GET /api/ai/generateStream?message=...`
+- `GET /api/personalities`
+- `GET /api/debug/token`
+
+## Screenshots (Placeholders)
+
+Put your images under `docs/images/` with the names below.
 
 ```text
-src/main/resources/static/images/
+docs/images/
   chat.png
   google_oauth.png
   index.png
@@ -119,17 +124,17 @@ src/main/resources/static/images/
   profile.png
 ```
 
-Preview blocks:
+Markdown references (already ready):
 
-![Index](src/main/resources/static/images/index.png)
-![Index EN](src/main/resources/static/images/index-en.png)
-![Login](src/main/resources/static/images/login.png)
-![Google OAuth](src/main/resources/static/images/google_oauth.png)
-![Chat](src/main/resources/static/images/chat.png)
-![Jungian Analysis EN](src/main/resources/static/images/jungian-analysis-en.png)
-![Profile](src/main/resources/static/images/profile.png)
+![Index](docs/images/index.png)
+![Index EN](docs/images/index-en.png)
+![Login](docs/images/login.png)
+![Google OAuth](docs/images/google_oauth.png)
+![Chat](docs/images/chat.png)
+![Jungian Analysis EN](docs/images/jungian-analysis-en.png)
+![Profile](docs/images/profile.png)
 
-## Project Structure
+## Project Structure (Short)
 
 ```text
 src/main/java/com/atlas/Psikosys
@@ -142,25 +147,20 @@ src/main/java/com/atlas/Psikosys
   service/
 
 src/main/resources
-  application.properties
-  messages_en.properties
-  messages_tr.properties
-  personalities.json
-  personalities-en.json
-  personalities-tr.json
   static/
-    css/
-    images/
-    js/
   templates/
+  personalities.json
+  personalities-tr.json
+  personalities-en.json
+  application.properties
 ```
 
-## Security Notes
+## Security Note
 
-- Never commit real API keys or OAuth secrets.
-- Keep `.env` local and rotate keys immediately if exposed.
+- Do not commit real API keys or OAuth secrets.
+- Keep `.env` local and rotate keys if accidentally exposed.
 
 ## License
 
-Add your preferred license (for example: MIT or Apache-2.0).
+Add your preferred license here (MIT, Apache-2.0, etc.).
 
