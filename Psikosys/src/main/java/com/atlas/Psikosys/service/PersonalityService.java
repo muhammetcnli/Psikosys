@@ -1,6 +1,6 @@
 package com.atlas.Psikosys.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,9 @@ public class PersonalityService {
             }
 
             try (InputStream inputStream = resource.getInputStream()) {
-                return objectMapper.readValue(inputStream, new TypeReference<Map<String, PersonalityData>>() {});
+                JavaType mapType = objectMapper.getTypeFactory()
+                        .constructMapType(Map.class, String.class, PersonalityData.class);
+                return objectMapper.readValue(inputStream, mapType);
             }
         } catch (IOException e) {
             throw new RuntimeException("Could not load personalities for language: " + language, e);
