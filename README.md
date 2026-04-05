@@ -1,15 +1,22 @@
 # Psikosys
 
-Psikosys is a Spring Boot web application that combines AI chat, Jungian-style personality prompts, and user account management (form login + Google OAuth2).
+[![Java](https://img.shields.io/badge/Java-21-007396?logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.3-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Maven](https://img.shields.io/badge/Maven-Build-C71A36?logo=apachemaven&logoColor=white)](https://maven.apache.org/)
+[![MySQL](https://img.shields.io/badge/MySQL-8%2B-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Thymeleaf](https://img.shields.io/badge/Thymeleaf-Template-005F0F?logo=thymeleaf&logoColor=white)](https://www.thymeleaf.org/)
+[![Spring Security](https://img.shields.io/badge/Spring%20Security-Auth-6DB33F?logo=springsecurity&logoColor=white)](https://spring.io/projects/spring-security)
+
+Psikosys is a Spring Boot web application that combines AI-powered chat, Jungian-Freudian style personality prompting, and secure account management (form login + Google OAuth2).
 
 ## Features
 
-- AI-supported chat flow with personality-based prompt selection
-- Multi-language support (`tr` / `en`) with cookie + user preference sync
-- User registration, login, profile management, and password update
-- Google OAuth2 login integration
-- Thymeleaf-based UI pages (`index`, `login`, `register`, `chat`, `user-profile`)
-- REST endpoints for AI generation and personality listing
+- Personality-based AI chat experience
+- Multi-language support (`tr` / `en`) with cookie + profile preference sync
+- User registration and login with Spring Security
+- Google OAuth2 authentication support
+- Chat history and personality selection per conversation
+- Profile management (language and password updates)
 
 ## Tech Stack
 
@@ -30,23 +37,14 @@ Psikosys is a Spring Boot web application that combines AI chat, Jungian-style p
 
 ### 1) Database setup
 
-Run these SQL commands in MySQL:
+Create a MySQL database named `psikosys`.
 
-```sql
-CREATE DATABASE IF NOT EXISTS psikosys
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
-CREATE USER IF NOT EXISTS 'springstudent'@'localhost'
-IDENTIFIED BY 'springstudent';
-
-GRANT ALL PRIVILEGES ON psikosys.* TO 'springstudent'@'localhost';
-FLUSH PRIVILEGES;
-```
+Make sure your datasource settings in `src/main/resources/application.properties` match your local MySQL credentials.
 
 ### 2) Environment variables (`.env`)
 
 Create a `.env` file in project root (same level as `pom.xml`):
+
 
 ```dotenv
 SPRING_AI_OPENAI_API_KEY=your_api_key_here
@@ -109,32 +107,17 @@ App URL:
 - `GET /api/personalities`
 - `GET /api/debug/token`
 
-## Screenshots (Placeholders)
+## Screenshots
 
-Put your images under `docs/images/` with the names below.
+![Index](Psikosys/src/main/resources/static/images/index.png)
+![Index EN](Psikosys/src/main/resources/static/images/index-en.png)
+![Login](Psikosys/src/main/resources/static/images/login.png)
+![Google OAuth](Psikosys/src/main/resources/static/images/google_oauth.png)
+![Chat](Psikosys/src/main/resources/static/images/chat.png)
+![Jungian Analysis EN](Psikosys/src/main/resources/static/images/jungian-analysis-en.png)
+![Profile](Psikosys/src/main/resources/static/images/profile.png)
 
-```text
-docs/images/
-  chat.png
-  google_oauth.png
-  index.png
-  index-en.png
-  jungian-analysis-en.png
-  login.png
-  profile.png
-```
-
-Markdown references (already ready):
-
-![Index](docs/images/index.png)
-![Index EN](docs/images/index-en.png)
-![Login](docs/images/login.png)
-![Google OAuth](docs/images/google_oauth.png)
-![Chat](docs/images/chat.png)
-![Jungian Analysis EN](docs/images/jungian-analysis-en.png)
-![Profile](docs/images/profile.png)
-
-## Project Structure (Short)
+## Project Structure
 
 ```text
 src/main/java/com/atlas/Psikosys
